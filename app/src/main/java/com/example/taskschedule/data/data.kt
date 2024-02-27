@@ -14,5 +14,6 @@ data class Actividad(
 ){
     var isPlayingState by mutableStateOf(isPlaying)
     var tiempostate by mutableStateOf(tiempo)
+    var startTimeMillis: Long? = null
 }
 

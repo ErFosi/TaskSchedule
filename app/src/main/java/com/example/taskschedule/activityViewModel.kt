@@ -10,7 +10,6 @@ import com.example.taskschedule.data.Actividad
 
 class ActivitiesViewModel : ViewModel() {
     private val _actividades = getTasks().toMutableStateList()
-    private var startTime = mutableMapOf<Actividad, Long>()
     private var idCounter = 20
     val actividades: List<Actividad>
         get()=_actividades
@@ -23,27 +22,30 @@ class ActivitiesViewModel : ViewModel() {
     }
 
     fun togglePlay(actividad: Actividad) {
+        // Encuentra el índice de la actividad en la lista
         val index = _actividades.indexOfFirst { it.id == actividad.id }
-        Log.e("ERROR",""+index)
         if (index != -1) {
+            val currentActividad = _actividades[index]
 
-            if (_actividades[index].isPlayingState){
+            if (currentActividad.isPlayingState) {
+                // Calcula la duración desde el inicio hasta ahora y actualiza el tiempo
                 val endTime = System.currentTimeMillis()
-                val diff = (endTime - (startTime[_actividades[index]] ?: endTime)) / 1000
-                _actividades[index].tiempostate += diff.toInt()
-                _actividades[index].tiempo=_actividades[index].tiempostate
-                _actividades[index].isPlayingState = false
-                _actividades[index].isPlaying= _actividades[index].isPlayingState
-                startTime.remove(_actividades[index])
+                val diff = (endTime - (currentActividad.startTimeMillis ?: endTime)) / 1000
+                currentActividad.tiempo += diff.toInt()
+                currentActividad.tiempostate = currentActividad.tiempo
+                // Actualiza los estados para reflejar que la actividad ha sido detenida
+                currentActividad.isPlayingState = false
+                currentActividad.isPlaying = false
+                currentActividad.startTimeMillis = null
             } else {
-                Log.e("ERROR",""+_actividades[index].isPlaying)
-                startTime[_actividades[index]] = System.currentTimeMillis()
-                _actividades[index].isPlayingState = true
-                _actividades[index].isPlaying= _actividades[index].isPlayingState
+                // Marca el inicio de la actividad
+                currentActividad.startTimeMillis = System.currentTimeMillis()
+                // Actualiza los estados para reflejar que la actividad está en reproducción
+                currentActividad.isPlayingState = true
+                currentActividad.isPlaying = true
             }
-            val actividad=Actividad(-1,"nombre", 0)
-            _actividades.add(actividad)
-            _actividades.remove(actividad)
+
+            _actividades[index] = currentActividad
         }
     }
 

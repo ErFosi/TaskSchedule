@@ -82,7 +82,7 @@ fun actividad(actividad: Actividad, actividadesViewModel: ActivitiesViewModel){
                         .padding(horizontal = 12.dp, vertical = 4.dp)
                 ) {
                     Text(
-                        text = "Tiempo: ${actividad.tiempo.toString()}",
+                        text = "Tiempo: ${actividad.tiempostate.toString()}",
                         style = MaterialTheme.typography.bodyLarge.copy(color = Color.White)
                     )
                 }
@@ -96,7 +96,7 @@ fun actividad(actividad: Actividad, actividadesViewModel: ActivitiesViewModel){
                 ) {
                     IconButton(onClick = {actividadesViewModel.togglePlay(actividad)}) {
                         Icon(
-                            imageVector = if (actividad.isPlaying) Icons.Default.Close else Icons.Default.PlayArrow,
+                            imageVector = if (actividad.isPlayingState) Icons.Default.Close else Icons.Default.PlayArrow,
                             contentDescription = if (actividad.isPlaying) "Stop" else "Play",
                             tint = Color(0xFFC7CBD5)
                         )
