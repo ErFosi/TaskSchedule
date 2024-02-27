@@ -7,6 +7,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.example.taskschedule.data.Actividad
+import kotlinx.coroutines.delay
 
 class ActivitiesViewModel : ViewModel() {
     private val _actividades = getTasks().toMutableStateList()
@@ -14,7 +15,9 @@ class ActivitiesViewModel : ViewModel() {
     val actividades: List<Actividad>
         get()=_actividades
 
-
+    fun agregarActTest(actividad: Actividad){
+        _actividades.add(actividad)
+    }
     fun agregarActividad(nombre: String) {
         idCounter++
         val nuevaActividad = Actividad(idCounter,nombre, 0)
@@ -51,8 +54,16 @@ class ActivitiesViewModel : ViewModel() {
 
 
 
-    fun onRemoveClick(actividad: Actividad) {
-        _actividades.remove(actividad)
+    fun onRemoveClick(id: Int) {
+        try {
+            // Intenta eliminar el elemento por el índice dado
+            _actividades.remove(_actividades.find { it.id==id })
+        } catch (e: IndexOutOfBoundsException) {
+            // Si ocurre un IndexOutOfBoundsException, simplemente ignóralo
+            // Puedes imprimir un mensaje de error o manejarlo como consideres necesario
+            // println("Intento de eliminar un elemento con un índice fuera de rango: $e")
+            Log.d("e","El indice es")
+        }
     }
 
 }
