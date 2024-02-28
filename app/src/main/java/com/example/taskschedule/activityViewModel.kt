@@ -52,7 +52,12 @@ class ActivitiesViewModel : ViewModel() {
         }
     }
 
-
+    // Método para actualizar la categoría de una actividad
+    fun updateCategoria(id: Int, nuevaCategoria: String) {
+        val index = _actividades.indexOfFirst { it.id == id }
+        //_actividades[index].categoria=nuevaCategoria
+        _actividades[index].categoriaState=nuevaCategoria
+    }
 
     fun onRemoveClick(id: Int) {
         try {

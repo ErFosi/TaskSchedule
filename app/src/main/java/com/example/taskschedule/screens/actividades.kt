@@ -1,4 +1,5 @@
 package com.example.taskschedule.screens
+import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.core.LinearEasing
@@ -29,6 +30,9 @@ import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.FabPosition
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
@@ -37,6 +41,7 @@ import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -48,6 +53,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Brush
@@ -61,6 +67,7 @@ import kotlinx.coroutines.delay
 
 @Composable
 fun AnimatedStripe() {
+    val color= MaterialTheme.colorScheme.primary
     val infiniteTransition = rememberInfiniteTransition()
     val animatedProgress by infiniteTransition.animateFloat(
         initialValue = 0f,
@@ -78,49 +85,54 @@ fun AnimatedStripe() {
         val animatedOffset = animatedProgress * (size.width + stripeWidth) - stripeWidth
 
         drawRect(
-            color = Color(0xFF233E8B),
+            color = color,
             topLeft = Offset(x = animatedOffset, y = 0f),
             size = Size(width = stripeWidth, height = size.height)
         )
     }
 }
 @Composable
-fun actividad(actividad: Actividad, actividadesViewModel: ActivitiesViewModel){
+fun actividad(actividad: Actividad, actividadesViewModel: ActivitiesViewModel) {
+    // Utiliza los colores del tema actual
     val gradientBrush = Brush.horizontalGradient(
-        colors = listOf(Color(0xFF0A0F24), Color(0xFF233E8B))
+        colors = listOf(MaterialTheme.colorScheme.primary, MaterialTheme.colorScheme.secondary)
     )
-    val backgroundColor = Color(0xFF4F679F)
+    val backgroundColor = MaterialTheme.colorScheme.background
+    val contentColor = MaterialTheme.colorScheme.onBackground
+    val iconTint = MaterialTheme.colorScheme.onSurfaceVariant
+
     var isVisible = remember { mutableStateOf(true) }
+
+    var isVisible_mult_box by remember { mutableStateOf(true) }
+    var expanded by remember { mutableStateOf(false) }
+    val categorias = listOf("Otros", "Ocio", "Estudios", "Deporte", "Diario")
+    var selectedCategoria by remember { mutableStateOf(categorias.first()) }
 
     LaunchedEffect(isVisible.value) {
         if (!isVisible.value) {
             // Espera un poco antes de ejecutar la acción de eliminación
-            var id=actividad.id
             delay(350)
-            isVisible.value=true
-            actividadesViewModel.onRemoveClick(id)
-
-
-
-
+            isVisible.value = true
+            actividadesViewModel.onRemoveClick(actividad.id)
         }
     }
 
     AnimatedVisibility(
         visible = isVisible.value,
-        enter = EnterTransition.None, // Aquí puedes ajustar para que la entrada sea instantánea o mínimamente perceptible
-        exit = fadeOut(animationSpec = tween(durationMillis = 300)) + shrinkVertically(animationSpec = tween(durationMillis = 300)),
-
-
+        enter = EnterTransition.None,
+        exit = fadeOut(animationSpec = tween(durationMillis = 300)) + shrinkVertically(
+            animationSpec = tween(
+                durationMillis = 300
+            )
+        ),
     ) {
-
         Card(
             modifier = Modifier
                 .padding(8.dp)
                 .fillMaxWidth(),
             shape = RoundedCornerShape(16.dp),
-            border = BorderStroke(1.dp, Color.Gray)
-
+            border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline),
+            colors = CardDefaults.cardColors(containerColor = backgroundColor)
         ) {
             Column(modifier = Modifier.background(backgroundColor)) {
                 // Nombre en una barra superior
@@ -129,24 +141,20 @@ fun actividad(actividad: Actividad, actividadesViewModel: ActivitiesViewModel){
                         .fillMaxWidth()
                         .background(brush = gradientBrush)
                         .padding(8.dp)
-
-
                 ) {
                     Text(
                         text = actividad.nombre,
-                        style = MaterialTheme.typography.titleLarge.copy(color = Color.White),
+                        style = MaterialTheme.typography.titleLarge.copy(color = MaterialTheme.colorScheme.onPrimary),
                         textAlign = TextAlign.Left
                     )
                 }
 
-                Spacer(modifier = Modifier.height(8.dp))
-
+                // Contenido de la actividad
                 Column(
                     modifier = Modifier
                         .padding(horizontal = 16.dp, vertical = 8.dp)
                         .fillMaxWidth()
                 ) {
-
                     Box(
                         modifier = Modifier
                             .background(brush = gradientBrush, shape = RoundedCornerShape(12.dp))
@@ -162,29 +170,51 @@ fun actividad(actividad: Actividad, actividadesViewModel: ActivitiesViewModel){
 
                     Row(
                         modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.End,
+                        horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        IconButton(onClick = {actividadesViewModel.togglePlay(actividad)}) {
-                            Icon(
-                                imageVector = if (actividad.isPlayingState) Icons.Default.Close else Icons.Default.PlayArrow,
-                                contentDescription = if (actividad.isPlaying) "Stop" else "Play",
-                                tint = Color(0xFFC7CBD5)
-                            )
+                        Box {
+                            TextButton(onClick = { expanded = true }) {
+                                Text("Categoría: ${actividad.categoriaState}")
+                            }
+                            DropdownMenu(
+                                expanded = expanded,
+                                onDismissRequest = { expanded = false },
+                            ) {
+                                categorias.forEach { categoria ->
+                                    DropdownMenuItem(
+                                        text = { Text(categoria) },
+                                        onClick = {
+                                            Log.d("E",categoria)
+                                            actividadesViewModel.updateCategoria(actividad.id, categoria)
+                                            expanded = false
+                                        }
+                                    )
+                                }
+                            }
                         }
 
-                        IconButton(onClick = { isVisible.value = false
-
-                        }
+                        Row(
+                            horizontalArrangement = Arrangement.End,
+                            verticalAlignment = Alignment.CenterVertically
                         ) {
-                            Icon(
-                                imageVector = Icons.Default.Delete,
-                                contentDescription = "Remove",
-                                tint = Color(0xFFC7CBD5)
-                            )
-                        }
-                    }
+                            IconButton(onClick = { actividadesViewModel.togglePlay(actividad) }) {
+                                Icon(
+                                    imageVector = if (actividad.isPlayingState) Icons.Default.Close else Icons.Default.PlayArrow,
+                                    contentDescription = if (actividad.isPlayingState) "Stop" else "Play",
+                                    tint = MaterialTheme.colorScheme.primary
+                                )
+                            }
 
+                            IconButton(onClick = { isVisible.value = false }) {
+                                Icon(
+                                    imageVector = Icons.Default.Delete,
+                                    contentDescription = "Remove",
+                                    tint = iconTint
+                                )
+                            }
+                        }
+                }
                     Box(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -196,14 +226,10 @@ fun actividad(actividad: Actividad, actividadesViewModel: ActivitiesViewModel){
                         }
                     }
 
-
-
-
                 }
             }
         }
     }
-
 }
 
 
