@@ -38,7 +38,10 @@ import androidx.wear.compose.material.ContentAlpha
 import com.example.taskschedule.ui.theme.TaskScheduleTheme
 import com.example.taskschedule.screens.DatePickerComposable
 import com.example.taskschedule.screens.ListaActividadesUI
+import dagger.hilt.android.HiltAndroidApp
 
+
+@HiltAndroidApp
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

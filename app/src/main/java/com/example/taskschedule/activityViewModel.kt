@@ -7,11 +7,24 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.example.taskschedule.data.Actividad
+import com.example.taskschedule.data.ProfilePreferencesDataStore
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.map
+import javax.inject.Inject
 
-class ActivitiesViewModel : ViewModel() {
+@HiltViewModel
+class ActivitiesViewModel @Inject constructor(
+private val settings:ProfilePreferencesDataStore
+): ViewModel() {
+    val oscuro =settings.settingsFlow.map{it.oscuro}
+    val idioma =settings.settingsFlow.map{it.idioma}
     private val _actividades = getTasks().toMutableStateList()
     private var idCounter = 20
+
+    fun cambiarOscuro(oscuro : Boolean){
+
+    }
     val actividades: List<Actividad>
         get()=_actividades
 
