@@ -34,6 +34,7 @@ import com.example.taskschedule.screens.ListaActividadesUI
 import com.example.taskschedule.screens.LanguageAndThemeSelector
 import android.util.Log
 import androidx.activity.viewModels
+import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.runtime.collectAsState
 import androidx.lifecycle.viewModelScope
@@ -44,11 +45,10 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
-class MainActivity : ComponentActivity() {
+class MainActivity : AppCompatActivity() {
 
     private val viewModel by viewModels<ActivitiesViewModel>()
     override fun onCreate(savedInstanceState: Bundle?) {
-        Log.d("e","pablo")
         super.onCreate(savedInstanceState)
         setContent {
             TaskSchedule(useDarkTheme  = viewModel.oscuro.collectAsState(initial = true).value) {
