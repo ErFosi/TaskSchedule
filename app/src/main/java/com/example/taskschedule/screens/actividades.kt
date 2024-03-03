@@ -8,22 +8,17 @@ import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
-import androidx.compose.animation.expandVertically
-import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
-import androidx.compose.animation.shrinkHorizontally
 import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.PlayArrow
@@ -37,7 +32,6 @@ import androidx.compose.material3.FabPosition
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -46,24 +40,23 @@ import androidx.compose.material3.TextField
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+
 import androidx.compose.ui.unit.dp
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
-import androidx.lifecycle.viewmodel.compose.viewModel
-
 import com.example.taskschedule.ActivitiesViewModel
 import com.example.taskschedule.data.Actividad
 import kotlinx.coroutines.delay
+import androidx.compose.ui.res.stringResource
+import com.example.taskschedule.R
 
 @Composable
 fun AnimatedStripe() {
@@ -105,7 +98,7 @@ fun actividad(actividad: Actividad, actividadesViewModel: ActivitiesViewModel) {
 
     var isVisible_mult_box by remember { mutableStateOf(true) }
     var expanded by remember { mutableStateOf(false) }
-    val categorias = listOf("Otros", "Ocio", "Estudios", "Deporte", "Diario")
+    val categorias = listOf(stringResource(id = R.string.otros), stringResource(id = R.string.ocio), stringResource(id = R.string.ocupacion), stringResource(id = R.string.deporte), stringResource(id = R.string.diario))
     var selectedCategoria by remember { mutableStateOf(categorias.first()) }
 
     LaunchedEffect(isVisible.value) {
@@ -161,7 +154,7 @@ fun actividad(actividad: Actividad, actividadesViewModel: ActivitiesViewModel) {
                             .padding(horizontal = 12.dp, vertical = 4.dp)
                     ) {
                         Text(
-                            text = "Tiempo: ${formatTime(actividad.tiempostate)}",
+                            text = stringResource(id = R.string.tiempo)+": ${formatTime(actividad.tiempostate)}",
                             style = MaterialTheme.typography.bodyLarge.copy(color = Color.White)
                         )
                     }
@@ -175,7 +168,7 @@ fun actividad(actividad: Actividad, actividadesViewModel: ActivitiesViewModel) {
                     ) {
                         Box {
                             TextButton(onClick = { expanded = true }) {
-                                Text("Categoría: ${actividad.categoriaState}")
+                                Text(stringResource(id = R.string.categoria)+"${actividad.categoriaState}")
                             }
                             DropdownMenu(
                                 expanded = expanded,
@@ -201,7 +194,7 @@ fun actividad(actividad: Actividad, actividadesViewModel: ActivitiesViewModel) {
                             IconButton(onClick = { actividadesViewModel.togglePlay(actividad) }) {
                                 Icon(
                                     imageVector = if (actividad.isPlayingState) Icons.Default.Close else Icons.Default.PlayArrow,
-                                    contentDescription = if (actividad.isPlayingState) "Stop" else "Play",
+                                    contentDescription = if (actividad.isPlayingState) stringResource(id = R.string.stop) else stringResource(id = R.string.play) ,
                                     tint = MaterialTheme.colorScheme.primary
                                 )
                             }
@@ -209,7 +202,7 @@ fun actividad(actividad: Actividad, actividadesViewModel: ActivitiesViewModel) {
                             IconButton(onClick = { isVisible.value = false }) {
                                 Icon(
                                     imageVector = Icons.Default.Delete,
-                                    contentDescription = "Remove",
+                                    contentDescription = stringResource(id = R.string.remove),
                                     tint = iconTint
                                 )
                             }
@@ -243,7 +236,7 @@ fun ListaActividadesUI(actividadesViewModel: ActivitiesViewModel) {
             FloatingActionButton(
                 onClick = { showDialog.value = true },
             ) {
-                Icon(Icons.Filled.Add, contentDescription = "Agregar Actividad")
+                Icon(Icons.Filled.Add, contentDescription = stringResource(id = R.string.agregar_act))
             }
         },
         floatingActionButtonPosition = FabPosition.Center,
@@ -256,13 +249,13 @@ fun ListaActividadesUI(actividadesViewModel: ActivitiesViewModel) {
     if (showDialog.value) {
         AlertDialog(
             onDismissRequest = { showDialog.value = false },
-            title = { Text("Agregar Actividad") },
+            title = { Text(stringResource(id = R.string.agregar_act)) },
             text = {
                 // TextField para ingresar el nombre de la nueva actividad
                 TextField(
                     value = textState.value,
                     onValueChange = { textState.value = it },
-                    label = { Text("Nombre de la actividad") }
+                    label = { Text(stringResource(id = R.string.nombre)) }
                 )
             },
             confirmButton = {
@@ -273,12 +266,12 @@ fun ListaActividadesUI(actividadesViewModel: ActivitiesViewModel) {
                         textState.value = ""
                     }
                 ) {
-                    Text("Agregar")
+                    Text(stringResource(id = R.string.agregar))
                 }
             },
             dismissButton = {
                 Button(onClick = { showDialog.value = false }) {
-                    Text("Cancelar")
+                    Text(stringResource(id = R.string.cancelar))
                 }
             }
         )
@@ -294,10 +287,12 @@ fun ListaActividades( modifier: Modifier = Modifier, actividadesViewModel: Activ
         }
     }
 }
+
+/*
 @Preview(showBackground = true)
 @Composable
 fun actividadPreview(){
-    var viewModelo:ActivitiesViewModel= ActivitiesViewModel()
+    var viewModelo by ActivitiesViewModel
     viewModelo.agregarActividad("TEST DE VIEWMODEL")
     var actividad=Actividad(id=1,nombre = "Test 1", tiempo = 200)
     actividad(actividad, actividadesViewModel = viewModelo)
@@ -360,7 +355,7 @@ fun listaPreview(){
     )
     ListaActividades(actividadesViewModel = viewModelo)
 }
-
+*/
 
 fun formatTime(seconds: Int): String {
     val hours = seconds / 3600
@@ -372,3 +367,4 @@ fun formatTime(seconds: Int): String {
         else -> "${remainingSeconds}s"
     }
 }
+

@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Task Schedule</string>
+    <string name="otros">Besteak</string>
+    <string name="ocio">Aisia</string>
+    <string name="ocupacion">Zeregin</string>
+    <string name="deporte">Kirola</string>
+    <string name="diario">Egunekoa</string>
+    <string name="tiempo">Denbora</string>
+    <string name="categoria">Kategoria</string>
+    <string name="stop">Geldi</string>
+    <string name="play">Hasi</string>
+    <string name="remove">Ezabatu</string>
+    <string name="agregar_act">Aktibitate berria</string>
+    <string name="nombre">Aktibitatearen izena</string>
+    <string name="agregar">Eraiki</string>
+    <string name="cancelar">Deuseztatu</string>
+    <string name="selecciona">Zure hizkuntza aukeratu</string>
+    <string name="claro">Modu argia</string>
+    <string name="oscuro">Modu iluna</string>
+    <string name="idioma">Hizkuntza</string>
+</resources>

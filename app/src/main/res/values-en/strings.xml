@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Task Schedule</string>
+    <string name="otros">Others</string>
+    <string name="ocio">Leisure</string>
+    <string name="ocupacion">Ocupation</string>
+    <string name="deporte">Sport</string>
+    <string name="diario">Daily</string>
+    <string name="tiempo">Time</string>
+    <string name="categoria">Category</string>
+    <string name="stop">Stop</string>
+    <string name="play">Start</string>
+    <string name="remove">Remove</string>
+    <string name="agregar_act">New Activity</string>
+    <string name="nombre">Activity\'s name</string>
+    <string name="agregar">Add</string>
+    <string name="cancelar">Cancel</string>
+    <string name="selecciona">Select your language</string>
+    <string name="claro">Light mode</string>
+    <string name="oscuro">Dark mode</string>
+    <string name="idioma">Language</string>
+</resources>

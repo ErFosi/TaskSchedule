@@ -6,11 +6,14 @@ import androidx.compose.ui.layout.LookaheadScope
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.example.taskschedule.data.Actividad
+import com.example.taskschedule.data.Idioma
 import com.example.taskschedule.data.ProfilePreferencesDataStore
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
@@ -20,10 +23,16 @@ private val settings:ProfilePreferencesDataStore
     val oscuro =settings.settingsFlow.map{it.oscuro}
     val idioma =settings.settingsFlow.map{it.idioma}
     private val _actividades = getTasks().toMutableStateList()
-    private var idCounter = 20
+    private var idCounter = 1
 
     fun cambiarOscuro(oscuro : Boolean){
+        viewModelScope.launch{settings.updateOscuro(oscuro)}
 
+    }
+
+
+    fun updateIdioma(idioma:Idioma){
+        viewModelScope.launch { settings.updateIdioma(idioma) }
     }
     val actividades: List<Actividad>
         get()=_actividades
@@ -69,7 +78,8 @@ private val settings:ProfilePreferencesDataStore
     fun updateCategoria(id: Int, nuevaCategoria: String) {
         val index = _actividades.indexOfFirst { it.id == id }
         //_actividades[index].categoria=nuevaCategoria
-        _actividades[index].categoriaState=nuevaCategoria
+        if (index != -1){_actividades[index].categoriaState=nuevaCategoria}
+
     }
 
     fun onRemoveClick(id: Int) {

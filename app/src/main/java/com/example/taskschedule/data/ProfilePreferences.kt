@@ -20,7 +20,7 @@ val Context.profilePreferences: DataStore<Preferences> by preferencesDataStore("
 enum class Idioma(val codigo: String){
     Castellano(codigo="es"),
     Euskera(codigo="eu"),
-    Ingles(codigo="en")
+    English(codigo="en")
 }
 data class Settings(val oscuro:Boolean,
 val idioma:Idioma)
