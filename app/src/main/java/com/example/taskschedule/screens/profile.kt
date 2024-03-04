@@ -15,11 +15,13 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -33,6 +35,7 @@ import com.example.taskschedule.ui.theme.TaskScheduleTheme
 @Composable
 fun LanguageAndThemeSelector(actividadesViewModel: ActivitiesViewModel) {
     var idioma=""
+    //val context = LocalContext.current
     idioma=stringResource(id = R.string.idioma)
     var selectedLanguage by remember { mutableStateOf(idioma) }
     var isDarkTheme by remember { mutableStateOf(false) }
@@ -53,8 +56,19 @@ fun LanguageAndThemeSelector(actividadesViewModel: ActivitiesViewModel) {
                     DropdownMenuItem(
                         text = { Text(idioma,fontWeight = FontWeight.Bold) },
                         onClick = {
+                            expanded=false
                             selectedLanguage=idioma
                             expanded = false
+                            var code="es"
+                            if (selectedLanguage.equals("English")){
+                                code="en"
+                            }
+                            else if(selectedLanguage.equals("Euskera") ){
+                                code="eu"
+                            }
+
+                            actividadesViewModel.updateIdioma(Idioma.getFromCode(code))
+
                         }
                     )
                 }

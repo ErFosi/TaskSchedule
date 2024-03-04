@@ -1,5 +1,6 @@
 package com.example.taskschedule;
 
+import android.content.Context
 import android.util.Log
 import androidx.compose.runtime.toMutableStateList
 import androidx.compose.ui.layout.LookaheadScope
@@ -15,16 +16,27 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import com.example.taskschedule.utils.LanguageManager
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.first
 
 @HiltViewModel
 class ActivitiesViewModel @Inject constructor(
-private val settings:ProfilePreferencesDataStore
+private val settings:ProfilePreferencesDataStore,
+private val languageManager: LanguageManager
 ): ViewModel() {
     val oscuro =settings.settingsFlow.map{it.oscuro}
-    val idioma =settings.settingsFlow.map{it.idioma}
+    val idioma = settings.settingsFlow.map {it.idioma}
     private val _actividades = getTasks().toMutableStateList()
     private var idCounter = 1
-
+    init {
+        this.settings.language()
+        viewModelScope.launch {
+            //changeLang(idioma.first())
+            changeLang(Idioma.getFromCode(settings.language().first()))
+            Log.d("I","Se inicia la app con el idioma:"+settings.language().first())
+        }
+    }
     fun cambiarOscuro(oscuro : Boolean){
         viewModelScope.launch{settings.updateOscuro(oscuro)}
 
@@ -32,7 +44,9 @@ private val settings:ProfilePreferencesDataStore
 
 
     fun updateIdioma(idioma:Idioma){
-        viewModelScope.launch { settings.updateIdioma(idioma) }
+        viewModelScope.launch { settings.setLanguage(idioma.code) }
+        this.changeLang(idioma)
+        Log.d("t","Se actualiza el idioma a"+idioma.language)
     }
     val actividades: List<Actividad>
         get()=_actividades
@@ -92,6 +106,13 @@ private val settings:ProfilePreferencesDataStore
             // println("Intento de eliminar un elemento con un índice fuera de rango: $e")
             Log.d("e","El indice es")
         }
+    }
+    //apartado del idioma
+    // Current app's language and preferred language (may not be the same at the beginning)
+    val currentSetLang by languageManager::currentLang
+    fun changeLang(idioma: Idioma) {
+        languageManager.changeLang(idioma)
+        //viewModelScope.launch(Dispatchers.IO) { settings.updateIdioma(idioma) }
     }
 
 }

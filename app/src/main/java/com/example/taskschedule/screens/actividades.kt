@@ -176,7 +176,7 @@ fun actividad(actividad: Actividad, actividadesViewModel: ActivitiesViewModel) {
                             ) {
                                 categorias.forEach { categoria ->
                                     DropdownMenuItem(
-                                        text = { Text(categoria) },
+                                        text = { Text(categoria+":") },
                                         onClick = {
                                             Log.d("E",categoria)
                                             actividadesViewModel.updateCategoria(actividad.id, categoria)
