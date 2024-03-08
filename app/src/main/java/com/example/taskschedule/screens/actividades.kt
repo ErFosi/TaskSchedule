@@ -15,6 +15,7 @@ import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -57,6 +58,7 @@ import com.example.taskschedule.data.Actividad
 import kotlinx.coroutines.delay
 import androidx.compose.ui.res.stringResource
 import com.example.taskschedule.R
+import kotlinx.coroutines.flow.Flow
 
 @Composable
 fun AnimatedStripe() {
@@ -154,7 +156,7 @@ fun actividad(actividad: Actividad, actividadesViewModel: ActivitiesViewModel) {
                             .padding(horizontal = 12.dp, vertical = 4.dp)
                     ) {
                         Text(
-                            text = stringResource(id = R.string.tiempo)+": ${formatTime(actividad.tiempostate)}",
+                            text = stringResource(id = R.string.tiempo)+": ${formatTime(actividad.tiempo)}",
                             style = MaterialTheme.typography.bodyLarge.copy(color = Color.White)
                         )
                     }
@@ -168,7 +170,7 @@ fun actividad(actividad: Actividad, actividadesViewModel: ActivitiesViewModel) {
                     ) {
                         Box {
                             TextButton(onClick = { expanded = true }) {
-                                Text(stringResource(id = R.string.categoria)+"${actividad.categoriaState}")
+                                Text(stringResource(id = R.string.categoria)+":"+"${actividad.categoria}")
                             }
                             DropdownMenu(
                                 expanded = expanded,
@@ -176,10 +178,12 @@ fun actividad(actividad: Actividad, actividadesViewModel: ActivitiesViewModel) {
                             ) {
                                 categorias.forEach { categoria ->
                                     DropdownMenuItem(
-                                        text = { Text(categoria+":") },
+                                        text = { Text(categoria) },
                                         onClick = {
                                             Log.d("E",categoria)
-                                            actividadesViewModel.updateCategoria(actividad.id, categoria)
+                                            var act_copy=actividad.copy()
+                                            act_copy.categoria=categoria
+                                            actividadesViewModel.updateCategoria(act_copy, categoria)
                                             expanded = false
                                         }
                                     )
@@ -193,8 +197,8 @@ fun actividad(actividad: Actividad, actividadesViewModel: ActivitiesViewModel) {
                         ) {
                             IconButton(onClick = { actividadesViewModel.togglePlay(actividad) }) {
                                 Icon(
-                                    imageVector = if (actividad.isPlayingState) Icons.Default.Close else Icons.Default.PlayArrow,
-                                    contentDescription = if (actividad.isPlayingState) stringResource(id = R.string.stop) else stringResource(id = R.string.play) ,
+                                    imageVector = if (actividad.isPlaying) Icons.Default.Close else Icons.Default.PlayArrow,
+                                    contentDescription = if (actividad.isPlaying) stringResource(id = R.string.stop) else stringResource(id = R.string.play) ,
                                     tint = MaterialTheme.colorScheme.primary
                                 )
                             }
@@ -214,7 +218,7 @@ fun actividad(actividad: Actividad, actividadesViewModel: ActivitiesViewModel) {
                             .height(4.dp)
                     ) {
 
-                        if (actividad.isPlayingState) {
+                        if (actividad.isPlaying) {
                             AnimatedStripe()
                         }
                     }
@@ -287,6 +291,8 @@ fun ListaActividades( modifier: Modifier = Modifier, actividadesViewModel: Activ
         }
     }
 }
+
+
 
 /*
 @Preview(showBackground = true)

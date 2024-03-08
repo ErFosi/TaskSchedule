@@ -37,12 +37,13 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.runtime.collectAsState
+import androidx.compose.ui.res.stringResource
 import androidx.datastore.preferences.preferencesDataStore
 import androidx.lifecycle.viewModelScope
 import com.example.compose.TaskSchedule
 import com.example.taskschedule.data.Idioma
 
-import com.example.taskschedule.ui.theme.TaskScheduleTheme
+//import com.example.taskschedule.ui.theme.TaskScheduleTheme
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.first
@@ -85,8 +86,18 @@ fun TaskBar(
 ) {
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route ?: ""
+    var text=""
+    if (currentRoute.equals("listaActividades")){
+        text= stringResource(id = R.string.Lista)
+    }
+    else if(currentRoute.equals("datePicker")){
+        text= stringResource(id = R.string.Estadísticas)
+    }
+    else if(currentRoute.equals("settings")){
+        text= stringResource(id = R.string.settings)
+    }
     TopAppBar(
-        title = { Text(currentRoute) },
+        title = { Text(text) },
         colors = TopAppBarDefaults.mediumTopAppBarColors(
             containerColor = MaterialTheme.colorScheme.primaryContainer
         ),

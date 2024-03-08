@@ -18,4 +18,7 @@
     <string name="claro">Modo claro</string>
     <string name="oscuro">Modo oscuro</string>
     <string name="idioma">Idioma</string>
+    <string name="settings">settings</string>
+    <string name="Lista">Lista de Actividades</string>
+    <string name="Estadísticas">Estadísticas</string>
 </resources>

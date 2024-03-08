@@ -29,7 +29,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.example.taskschedule.ActivitiesViewModel
 import com.example.taskschedule.R
 import com.example.taskschedule.data.Idioma
-import com.example.taskschedule.ui.theme.TaskScheduleTheme
+
 
 
 @Composable
@@ -38,8 +38,11 @@ fun LanguageAndThemeSelector(actividadesViewModel: ActivitiesViewModel) {
     //val context = LocalContext.current
     idioma=stringResource(id = R.string.idioma)
     var selectedLanguage by remember { mutableStateOf(idioma) }
-    var isDarkTheme by remember { mutableStateOf(false) }
-    var expanded by remember{ mutableStateOf(false) }
+    //var isDarkTheme by remember { mutableStateOf(false) }
+    //var expanded by remember{ mutableStateOf(false) }
+    var expanded by rememberSaveable {
+        mutableStateOf(false)
+    }
     val idiomas = listOf("Español", "Euskera", "English")
     Column(modifier = Modifier.fillMaxSize(), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
         Text(stringResource(id = R.string.selecciona), fontWeight = FontWeight.Bold)
@@ -58,7 +61,6 @@ fun LanguageAndThemeSelector(actividadesViewModel: ActivitiesViewModel) {
                         onClick = {
                             expanded=false
                             selectedLanguage=idioma
-                            expanded = false
                             var code="es"
                             if (selectedLanguage.equals("English")){
                                 code="en"
@@ -98,10 +100,3 @@ fun LanguageAndThemeSelector(actividadesViewModel: ActivitiesViewModel) {
     }
 }
 
-@Preview(showBackground = true)
-@Composable
-fun PreviewLanguageAndThemeSelector() {
-    TaskScheduleTheme {
-        //LanguageAndThemeSelector()
-    }
-}
