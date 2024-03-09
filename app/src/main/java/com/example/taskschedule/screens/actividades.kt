@@ -1,4 +1,5 @@
 package com.example.taskschedule.screens
+import android.content.res.Configuration
 import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.EnterTransition
@@ -15,13 +16,15 @@ import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyListScope
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Pause
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
@@ -45,6 +48,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -52,13 +56,13 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.text.style.TextAlign
-import com.example.taskschedule.ActivitiesViewModel
+import com.example.taskschedule.viewmodels.ActivitiesViewModel
 import com.example.taskschedule.data.Actividad
 import kotlinx.coroutines.delay
 import androidx.compose.ui.res.stringResource
 import com.example.taskschedule.R
-import kotlinx.coroutines.flow.Flow
 
 @Composable
 fun AnimatedStripe() {
@@ -93,15 +97,10 @@ fun actividad(actividad: Actividad, actividadesViewModel: ActivitiesViewModel) {
         colors = listOf(MaterialTheme.colorScheme.primary, MaterialTheme.colorScheme.secondary)
     )
     val backgroundColor = MaterialTheme.colorScheme.background
-    val contentColor = MaterialTheme.colorScheme.onBackground
     val iconTint = MaterialTheme.colorScheme.onSurfaceVariant
-
-    var isVisible = remember { mutableStateOf(true) }
-
-    var isVisible_mult_box by remember { mutableStateOf(true) }
+    val isVisible = remember { mutableStateOf(true) }
     var expanded by remember { mutableStateOf(false) }
     val categorias = listOf(stringResource(id = R.string.otros), stringResource(id = R.string.ocio), stringResource(id = R.string.ocupacion), stringResource(id = R.string.deporte), stringResource(id = R.string.diario))
-    var selectedCategoria by remember { mutableStateOf(categorias.first()) }
 
     LaunchedEffect(isVisible.value) {
         if (!isVisible.value) {
@@ -170,7 +169,7 @@ fun actividad(actividad: Actividad, actividadesViewModel: ActivitiesViewModel) {
                     ) {
                         Box {
                             TextButton(onClick = { expanded = true }) {
-                                Text(stringResource(id = R.string.categoria)+":"+"${actividad.categoria}")
+                                Text(stringResource(id = R.string.categoria)+": "+actividad.categoria)
                             }
                             DropdownMenu(
                                 expanded = expanded,
@@ -181,7 +180,7 @@ fun actividad(actividad: Actividad, actividadesViewModel: ActivitiesViewModel) {
                                         text = { Text(categoria) },
                                         onClick = {
                                             Log.d("E",categoria)
-                                            var act_copy=actividad.copy()
+                                            val act_copy=actividad.copy()
                                             act_copy.categoria=categoria
                                             actividadesViewModel.updateCategoria(act_copy, categoria)
                                             expanded = false
@@ -197,7 +196,7 @@ fun actividad(actividad: Actividad, actividadesViewModel: ActivitiesViewModel) {
                         ) {
                             IconButton(onClick = { actividadesViewModel.togglePlay(actividad) }) {
                                 Icon(
-                                    imageVector = if (actividad.isPlaying) Icons.Default.Close else Icons.Default.PlayArrow,
+                                    imageVector = if (actividad.isPlaying) Icons.Filled.Pause else Icons.Default.PlayArrow,
                                     contentDescription = if (actividad.isPlaying) stringResource(id = R.string.stop) else stringResource(id = R.string.play) ,
                                     tint = MaterialTheme.colorScheme.primary
                                 )
@@ -283,11 +282,30 @@ fun ListaActividadesUI(actividadesViewModel: ActivitiesViewModel) {
 }
 
 @Composable
-fun ListaActividades( modifier: Modifier = Modifier, actividadesViewModel: ActivitiesViewModel) {
-    LazyColumn(modifier = modifier.padding(vertical = 8.dp)) {
-        items(items = actividadesViewModel.actividades) { actividad ->
-            actividad(actividad,actividadesViewModel)
+fun ListaActividades(modifier: Modifier = Modifier, actividadesViewModel: ActivitiesViewModel) {
+    val lista = actividadesViewModel.actividades.collectAsState(initial = emptyList()).value
+    val configuration = LocalConfiguration.current
 
+    if (configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+        // Pantalla horizontal: usar LazyVerticalGrid para dos columnas
+        LazyVerticalGrid(
+            columns = GridCells.Fixed(2),
+            modifier = modifier.padding(vertical = 8.dp)
+        ) {
+            items(items = lista, key = { actividad ->
+                actividad.id
+            }) { act ->
+                actividad(act, actividadesViewModel)
+            }
+        }
+    } else {
+        // Pantalla vertical: usar LazyColumn para una columna
+        LazyColumn(modifier = modifier.padding(vertical = 8.dp)) {
+            items(items = lista, key = { actividad ->
+                actividad.id
+            }) { act ->
+                actividad(act, actividadesViewModel)
+            }
         }
     }
 }
@@ -371,6 +389,17 @@ fun formatTime(seconds: Int): String {
         hours > 0 -> "${hours}h ${minutes}m"
         minutes > 0 -> "${minutes}m ${remainingSeconds}s"
         else -> "${remainingSeconds}s"
+    }
+}
+
+fun formatTimeFloat(seconds: Float): String {
+    val hours = seconds / 3600
+    val minutes = (seconds % 3600) / 60
+    val remainingSeconds = seconds % 60
+    return when {
+        hours >= 1 -> String.format("%.0fh %.0fm", hours, minutes)
+        minutes >= 1 -> String.format("%.0fm %.0fs", minutes, remainingSeconds)
+        else -> String.format("%.0fs", remainingSeconds)
     }
 }
 

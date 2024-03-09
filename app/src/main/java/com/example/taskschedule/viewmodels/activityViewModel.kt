@@ -1,4 +1,4 @@
-package com.example.taskschedule;
+package com.example.taskschedule.viewmodels;
 
 import android.content.Context
 import android.util.Log
@@ -22,6 +22,7 @@ import com.example.taskschedule.utils.LanguageManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
+import java.time.LocalDate
 
 @HiltViewModel
 class ActivitiesViewModel @Inject constructor(
@@ -31,7 +32,7 @@ private val languageManager: LanguageManager,
 ): ViewModel() {
     val oscuro =settings.settingsFlow.map{it.oscuro}
     val idioma = settings.settingsFlow.map {it.idioma}
-    private val _actividades = actividadesRepo.getActividadesStream()
+    private val _actividades = actividadesRepo.getActividadesPorFecha(LocalDate.now())
     init {
         this.settings.language()
         viewModelScope.launch {
@@ -62,7 +63,7 @@ private val languageManager: LanguageManager,
     fun agregarActividad(nombre: String) {
 
         val nuevaActividad = Actividad(
-            nombre = nombre, isPlaying = false, tiempo = 0, idUsuario = 1, categoria = "Otros", startTimeMillis = 0, id = 1)
+            nombre = nombre,id = 0) //el id es autogenerado ya que es autogenerate (esto se ve en data/data.kt donde está la entidad)
         viewModelScope.launch{
             actividadesRepo.insertActividad(nuevaActividad)
         }

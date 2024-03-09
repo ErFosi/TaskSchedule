@@ -2,6 +2,7 @@ package com.example.taskschedule.repositories
 
 import com.example.taskschedule.data.Actividad
 import kotlinx.coroutines.flow.Flow
+import java.time.LocalDate
 
 interface ActividadesRepositoryInterface {
     /**
@@ -28,4 +29,9 @@ interface ActividadesRepositoryInterface {
      * Modifica una actividad
      */
     suspend fun updateActividad(item: Actividad)
+
+    /**
+     * Obtiene todas las actividades para una fecha específica de la base de datos
+     */
+    fun getActividadesPorFecha(fecha: LocalDate): Flow<List<Actividad>>
 }

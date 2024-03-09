@@ -1,7 +1,6 @@
 package com.example.taskschedule
 
 import android.os.Bundle
-import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
@@ -32,27 +31,22 @@ import androidx.navigation.compose.rememberNavController
 import com.example.taskschedule.screens.DatePickerComposable
 import com.example.taskschedule.screens.ListaActividadesUI
 import com.example.taskschedule.screens.LanguageAndThemeSelector
-import android.util.Log
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.res.stringResource
-import androidx.datastore.preferences.preferencesDataStore
-import androidx.lifecycle.viewModelScope
 import com.example.compose.TaskSchedule
-import com.example.taskschedule.data.Idioma
+import com.example.taskschedule.viewmodels.ActivitiesViewModel
+import com.example.taskschedule.viewmodels.CalendarViewModel
 
 //import com.example.taskschedule.ui.theme.TaskScheduleTheme
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.launch
-
+import androidx.hilt.navigation.compose.hiltViewModel
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
     private val viewModel by viewModels<ActivitiesViewModel>()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
@@ -151,8 +145,10 @@ fun TaskDownBar(navController: NavHostController) {
 fun NavigationGraph(navController: NavHostController, viewModel: ActivitiesViewModel) {
     NavHost(navController = navController, startDestination = "listaActividades", Modifier.fillMaxSize()) {
         composable("datePicker") {
-            DatePickerComposable()
+            val calendarViewModel: CalendarViewModel = hiltViewModel()
+            DatePickerComposable(calendarViewModel = calendarViewModel)
         }
+
         composable("listaActividades") {
             ListaActividadesUI( viewModel)
         }

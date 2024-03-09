@@ -81,11 +81,20 @@ dependencies {
     implementation("androidx.datastore:datastore-preferences:1.0.0")
     implementation ("com.google.dagger:hilt-android:2.48.1")
     kapt ("com.google.dagger:hilt-compiler:2.48.1")
-
+    implementation("androidx.hilt:hilt-navigation-compose:1.0.0")
+    //Room
     val room_version = "2.6.1"
     implementation("androidx.room:room-runtime:${room_version}")
+
     //ksp("androidx.room:room-compiler:${room_version}")
     kapt("androidx.room:room-compiler:$room_version")
     implementation("androidx.room:room-ktx:${room_version}")
 
+    //Carousel card slider no se si lo usaré
+    implementation("com.google.accompanist:accompanist-pager:0.35.0-alpha")
+    implementation("androidx.compose.ui:ui-util:1.6.3")
+    implementation("io.coil-kt:coil-compose:2.2.2")
+
+    //Librerias de gráficos
+    implementation("com.github.tehras:charts:0.2.4-alpha")
 }

@@ -6,6 +6,7 @@ import androidx.compose.runtime.setValue
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import androidx.compose.runtime.Immutable
+import java.time.LocalDate
 
 
 @Immutable
@@ -19,5 +20,6 @@ data class Actividad(
     var startTimeMillis: Long = 0,
     var isPlaying: Boolean = false,
     val idUsuario: Int=0, //Modificar en la siguiente entrega con el login
+    val fecha: LocalDate = LocalDate.now()
 )
 

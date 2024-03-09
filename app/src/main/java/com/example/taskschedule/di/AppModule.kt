@@ -17,6 +17,7 @@ object AppModule {
     @Provides
     fun providesDatabase(@ApplicationContext app: Context) =
         Room.databaseBuilder(app, ActividadesDatabase::class.java, "actividades_db")
+            .createFromAsset("actividades_db.db")
             .fallbackToDestructiveMigration()
             .build()
 
