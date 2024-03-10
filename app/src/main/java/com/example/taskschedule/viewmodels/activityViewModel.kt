@@ -1,14 +1,22 @@
 package com.example.taskschedule.viewmodels;
 
+import android.app.NotificationManager
+import android.app.PendingIntent
 import android.content.Context
+import android.content.Intent
 import android.util.Log
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.toMutableStateList
 import androidx.compose.ui.layout.LookaheadScope
+import androidx.compose.ui.res.stringResource
+import androidx.core.app.NotificationCompat
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.taskschedule.MainActivity
+import com.example.taskschedule.R
 import com.example.taskschedule.data.Actividad
 import com.example.taskschedule.data.Idioma
 import com.example.taskschedule.data.ProfilePreferencesDataStore
@@ -22,7 +30,9 @@ import com.example.taskschedule.utils.LanguageManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.last
 import java.time.LocalDate
+import kotlin.random.Random
 
 @HiltViewModel
 class ActivitiesViewModel @Inject constructor(
@@ -47,6 +57,8 @@ private val languageManager: LanguageManager,
     }
 
 
+
+
     fun updateIdioma(idioma:Idioma){
         viewModelScope.launch { settings.setLanguage(idioma.code) }
         this.changeLang(idioma)
@@ -69,7 +81,7 @@ private val languageManager: LanguageManager,
         }
     }
 
-    fun togglePlay(actividad: Actividad) {
+    fun togglePlay(actividad: Actividad, context: Context) {
         // Encuentra el índice de la actividad en la lista
 
             val currentActividad = actividad.copy()
@@ -90,11 +102,13 @@ private val languageManager: LanguageManager,
                 // Actualiza los estados para reflejar que la actividad está en reproducción
                 //currentActividad.isPlayingState = true
                 currentActividad.isPlaying = true
+                sendNotification(actividad, context)
             }
 
             viewModelScope.launch {
                 actividadesRepo.updateActividad(currentActividad)
             }
+
     }
 
 
@@ -131,7 +145,45 @@ private val languageManager: LanguageManager,
         //viewModelScope.launch(Dispatchers.IO) { settings.updateIdioma(idioma) }
     }
 
+    private fun sendNotification(actividad:Actividad, context: Context){
+        val notificationManager = ContextCompat.getSystemService(
+            context,
+            NotificationManager::class.java
+        ) as NotificationManager
+        val intent = Intent(context, MainActivity::class.java).apply {
+            putExtra("id", actividad.id)
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+        }
+
+        val stopPendingIntent= PendingIntent.getActivity(context,1,intent,
+            PendingIntent.FLAG_ONE_SHOT or PendingIntent.FLAG_IMMUTABLE)
+        val builder = NotificationCompat.Builder(context, CHANNEL_ID)
+            .setSmallIcon(R.drawable.ic_launcher_background)
+            .setContentTitle(context.getString(R.string.notification_title))
+            .setContentText(context.getString(R.string.Estashaciendo)+" ${actividad.nombre}")
+            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+            .setContentIntent(stopPendingIntent)
+            .addAction(R.drawable.stop ,context.getString(R.string.stop),stopPendingIntent)
+
+        with(notificationManager) {
+            notify(generateRandomNotificationId(), builder.build())
+        }
+    }
+
+    fun generateRandomNotificationId(): Int {
+        // Genera un ID aleatorio dentro de un rango. Puedes ajustar el rango según sea necesario.
+        return Random.nextInt(1, 10000)
+    }
+    fun obtenerActividadPorId(id: Int): Flow<Actividad?> {
+        // Retorna el Flow directamente para ser coleccionado de forma asíncrona donde sea necesario
+        return actividadesRepo.getActividadStream(id)
+    }
+    companion object {
+        private const val CHANNEL_ID = "Task_channel" // Consider using a unique ID for each notification
+    }
 }
+
+
 
 private fun getTasks(): List<Actividad> {
     return emptyList()

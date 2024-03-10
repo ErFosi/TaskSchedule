@@ -57,6 +57,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import com.example.taskschedule.viewmodels.ActivitiesViewModel
 import com.example.taskschedule.data.Actividad
@@ -100,6 +101,20 @@ fun actividad(actividad: Actividad, actividadesViewModel: ActivitiesViewModel) {
     val iconTint = MaterialTheme.colorScheme.onSurfaceVariant
     val isVisible = remember { mutableStateOf(true) }
     var expanded by remember { mutableStateOf(false) }
+    val categoriasMap = mapOf(
+        stringResource(id = R.string.otros) to "otros",
+        stringResource(id = R.string.ocio) to "ocio",
+        stringResource(id = R.string.ocupacion) to "ocupacion",
+        stringResource(id = R.string.deporte) to "deporte",
+        stringResource(id = R.string.diario) to "diario"
+    )
+    val categoriasMapInverso = mapOf(
+        "otros" to stringResource(id = R.string.otros)  ,
+        "ocio" to stringResource(id = R.string.ocio) ,
+        "ocupacion" to  stringResource(id = R.string.ocupacion),
+        "deporte" to stringResource(id = R.string.deporte)  ,
+        "diario" to stringResource(id = R.string.diario)
+    )
     val categorias = listOf(stringResource(id = R.string.otros), stringResource(id = R.string.ocio), stringResource(id = R.string.ocupacion), stringResource(id = R.string.deporte), stringResource(id = R.string.diario))
 
     LaunchedEffect(isVisible.value) {
@@ -169,32 +184,35 @@ fun actividad(actividad: Actividad, actividadesViewModel: ActivitiesViewModel) {
                     ) {
                         Box {
                             TextButton(onClick = { expanded = true }) {
-                                Text(stringResource(id = R.string.categoria)+": "+actividad.categoria)
+                                Text(stringResource(id = R.string.categoria)+": "+(categoriasMapInverso[actividad.categoria] ?: stringResource(
+                                    id = R.string.pulsa
+                                )))
                             }
                             DropdownMenu(
                                 expanded = expanded,
                                 onDismissRequest = { expanded = false },
                             ) {
-                                categorias.forEach { categoria ->
+                                categoriasMap.forEach { (categoriaLocalizada, valorEnEspanol) ->
                                     DropdownMenuItem(
-                                        text = { Text(categoria) },
+                                        text = { Text(categoriaLocalizada) },
                                         onClick = {
-                                            Log.d("E",categoria)
-                                            val act_copy=actividad.copy()
-                                            act_copy.categoria=categoria
-                                            actividadesViewModel.updateCategoria(act_copy, categoria)
+                                            Log.d("E", valorEnEspanol)
+                                            val actCopy = actividad.copy()
+                                            actCopy.categoria = valorEnEspanol
+                                            actividadesViewModel.updateCategoria(actCopy, valorEnEspanol)
                                             expanded = false
                                         }
                                     )
                                 }
                             }
                         }
-
+                        val contex= LocalContext.current
                         Row(
                             horizontalArrangement = Arrangement.End,
                             verticalAlignment = Alignment.CenterVertically
                         ) {
-                            IconButton(onClick = { actividadesViewModel.togglePlay(actividad) }) {
+                            IconButton(onClick = { actividadesViewModel.togglePlay(actividad,
+                                contex) }) {
                                 Icon(
                                     imageVector = if (actividad.isPlaying) Icons.Filled.Pause else Icons.Default.PlayArrow,
                                     contentDescription = if (actividad.isPlaying) stringResource(id = R.string.stop) else stringResource(id = R.string.play) ,
@@ -396,6 +414,9 @@ fun formatTimeFloat(seconds: Float): String {
     val hours = seconds / 3600
     val minutes = (seconds % 3600) / 60
     val remainingSeconds = seconds % 60
+    if (hours>24){
+        return(">24h")
+    }
     return when {
         hours >= 1 -> String.format("%.0fh %.0fm", hours, minutes)
         minutes >= 1 -> String.format("%.0fm %.0fs", minutes, remainingSeconds)

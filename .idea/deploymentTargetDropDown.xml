@@ -7,18 +7,18 @@
       </entry>
       <entry key="app">
         <State>
-          <runningDeviceTargetSelectedWithDropDown>
+          <targetSelectedWithDropDown>
             <Target>
-              <type value="RUNNING_DEVICE_TARGET" />
+              <type value="QUICK_BOOT_TARGET" />
               <deviceKey>
                 <Key>
-                  <type value="SERIAL_NUMBER" />
-                  <value value="29902994" />
+                  <type value="VIRTUAL_DEVICE_PATH" />
+                  <value value="C:\Users\alvar\.android\avd\Pixel_7_Pro_API_26.avd" />
                 </Key>
               </deviceKey>
             </Target>
-          </runningDeviceTargetSelectedWithDropDown>
-          <timeTargetWasSelectedWithDropDown value="2024-03-09T19:04:08.759065800Z" />
+          </targetSelectedWithDropDown>
+          <timeTargetWasSelectedWithDropDown value="2024-03-10T11:10:44.519569900Z" />
         </State>
       </entry>
       <entry key="listaFuncionalPreview">

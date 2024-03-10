@@ -97,4 +97,8 @@ dependencies {
 
     //Librerias de gráficos
     implementation("com.github.tehras:charts:0.2.4-alpha")
+
+    //gson para los json
+    implementation ("com.google.code.gson:gson:2.8.8")
+    implementation ("com.google.android.material:material:1.4.0")
 }

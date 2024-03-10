@@ -1,6 +1,7 @@
 package com.example.taskschedule.viewmodels
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.example.taskschedule.data.Actividad
 import com.example.taskschedule.repositories.ActividadesRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -12,6 +13,16 @@ import java.time.LocalDate
 import java.util.Date
 import javax.inject.Inject
 import javax.inject.Singleton
+import com.google.gson.GsonBuilder
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.last
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.launch
+import java.time.format.DateTimeFormatter
+import androidx.compose.runtime.collectAsState as collectAsState
+import kotlinx.coroutines.runBlocking
 
 
 @HiltViewModel
@@ -25,12 +36,25 @@ class CalendarViewModel @Inject constructor(private val actividadesRepo: Activid
     fun cambioFecha(nuevaFecha: LocalDate) {
         _fechaSelec.value = nuevaFecha // Actualiza el estado
     }
-    fun agruparActividadesPorCategoria(actividades: List<Actividad>): Map<String, Int> {
-        return actividades.groupBy { it.categoria }
-            .mapValues { entry -> entry.value.sumOf { it.tiempo } }
-    }
+    fun descargarActividadesJson(): String {
+        val gson = GsonBuilder().setPrettyPrinting().create()
+            return runBlocking {
+                val actividadesFiltradas = actividadesFecha.first().map { actividad ->
+                    mapOf(
+                        "nombre" to actividad.nombre,
+                        "tiempo" to actividad.tiempo,
+                        "categoria" to actividad.categoria,
+                        "fecha" to actividad.fecha.format(DateTimeFormatter.ISO_DATE)
+                    )
+                }
 
-    fun testListaActividades(){
 
-    }
+                val actividadesJson = gson.toJson(actividadesFiltradas)
+                return@runBlocking actividadesJson
+
+
+            }
+
+        }
+
 }

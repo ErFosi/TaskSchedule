@@ -21,4 +21,25 @@
     <string name="settings">settings</string>
     <string name="Lista">Lista de Actividades</string>
     <string name="Estadísticas">Estadísticas</string>
+    <string name="noText">Parece que no he hecho nada este dia</string>
+    <string name="Manera">de la siguiente manera:</string>
+    <string name="Invertido">He invertido el tiempo del día</string>
+    <string name="FechaSelec">Día Seleccionado:</string>
+    <string name="Decrementar">Decrementar día</string>
+    <string name="Incrementar">Incrementar día</string>
+    <string name="Graf">Gráficas</string>
+    <string name="Circ">Gráfico circular</string>
+    <string name="Bar">Gráfico de barras</string>
+    <string name="Agrupado">Agrupado por:</string>
+    <string name="Categ">Categoría</string>
+    <string name="Act">Actividad</string>
+    <string name="Selector">Selector de gráficos</string>
+    <string name="Compartir">Compartir</string>
+    <string name="No_Data">No hay datos</string>
+    <string name="Descargar">Descargar actividades</string>
+    <string name="channel_act">Canal de actividad</string>
+    <string name="channel_desc">Canal para gestionar la actividad actual</string>
+    <string name="notification_title">Estas haciendo una actividad</string>
+    <string name="Estashaciendo">Ahora estás haciendo</string>
+    <string name="pulsa">Pulsa para cambiar</string>
 </resources>

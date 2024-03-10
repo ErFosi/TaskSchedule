@@ -5,6 +5,8 @@ import android.graphics.Canvas
 import android.graphics.Rect
 import android.util.Log
 import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -54,6 +56,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.text.style.LineHeightStyle
@@ -91,28 +94,17 @@ import java.time.format.DateTimeFormatter
 import java.util.ArrayList
 import java.util.Locale
 import kotlin.random.Random
+import java.io.FileNotFoundException
+import java.io.FileOutputStream
+import java.io.IOException
+import android.content.Intent
+import androidx.compose.ui.res.stringResource
+import androidx.lifecycle.viewModelScope
+import com.example.taskschedule.R
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 
 
-@Composable
-fun CalendarTopBar(modifier: Modifier =Modifier, onPreviousMonthClick: () -> Unit, onNextMonthClick: () -> Unit) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(16.dp),
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        IconButton(onClick = onPreviousMonthClick) {
-            Icon(Icons.Filled.ArrowBack, contentDescription = "Previous Month")
-        }
-
-        Text(text = "Enero")
-
-        IconButton(onClick = onNextMonthClick) {
-            Icon(Icons.Filled.ArrowForward, contentDescription = "Next Month")
-        }
-    }
-}
 @Composable
 fun DatePickerComposable(calendarViewModel: CalendarViewModel) {
     val context = LocalContext.current
@@ -120,102 +112,101 @@ fun DatePickerComposable(calendarViewModel: CalendarViewModel) {
     val fechaSelec by calendarViewModel.fechaSelec.collectAsState()
     val formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy")
     val lista by calendarViewModel.actividadesFecha.collectAsState(initial = emptyList())
-    var mostrarGraficoCircular by remember { mutableStateOf(true) }
-    var expanded by remember { mutableStateOf(false) }
-    var agrupacionCategoria by remember { mutableStateOf(false) }
+    var mostrarGraficoCircular by rememberSaveable { mutableStateOf(true) }
+    var expanded by rememberSaveable { mutableStateOf(false) }
+    var agrupacionCategoria by rememberSaveable { mutableStateOf(false) }
     val colorSeleccionado = MaterialTheme.colors.primary
-    val colorNoSeleccionado = MaterialTheme.colors.secondaryVariant // Color más tenue cuando no está seleccionado
+    val colorNoSeleccionado = MaterialTheme.colors.secondaryVariant
     Column(modifier = Modifier.verticalScroll(rememberScrollState()),
         horizontalAlignment = Alignment.CenterHorizontally
         ) {
         Row(
             modifier = Modifier
-                .padding(10.dp), // Añade un poco de padding para un mejor diseño
+                .padding(10.dp),
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween // Espacia los elementos uniformemente
+            horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            // Botón para decrementar la fecha
+            val stringF=stringResource(id = R.string.FechaSelec)
             IconButton(onClick = { val nuevaFecha = fechaSelec.minusDays(1)
                 calendarViewModel.cambioFecha(nuevaFecha)
-                Toast.makeText(context, "Fecha seleccionada: ${nuevaFecha.format(formatter)}", Toast.LENGTH_SHORT).show()}) {
-                Icon(Icons.Default.ArrowLeft, contentDescription = "Decrementar día")
+                Toast.makeText(context, stringF+"${nuevaFecha.format(formatter)}", Toast.LENGTH_SHORT).show()}) {
+                Icon(Icons.Default.ArrowLeft, contentDescription = stringResource(id = R.string.Decrementar))
             }
 
-            // Selector de fecha
+
             Box(
                 modifier = Modifier
                     .weight(1f)
                     .padding(horizontal = 8.dp)
                     .wrapContentWidth(Alignment.CenterHorizontally)
             ) {
-                // Texto y botón para seleccionar fecha
+
                 TextButton(onClick = {
                     DatePickerDialog(context, { _, year, month, dayOfMonth ->
                         val fechaNueva = LocalDate.of(year, month + 1, dayOfMonth)
                         calendarViewModel.cambioFecha(fechaNueva)
-                        Toast.makeText(context, "Fecha seleccionada: ${fechaNueva.format(formatter)}", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(context, stringF+"${fechaNueva.format(formatter)}", Toast.LENGTH_SHORT).show()
                     }, fechaSelec.year, fechaSelec.monthValue - 1, fechaSelec.dayOfMonth).show()
                 }) {
-                    Text("Fecha seleccionada: "+"${fechaSelec.format(formatter)}",textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth())
+                    Text(stringF+"${fechaSelec.format(formatter)}",textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth())
                     //Icon(Icons.Default.ArrowDropDown, contentDescription = "Seleccionar fecha")
                 }
             }
 
-            // Botón para incrementar la fecha
+
             IconButton(onClick = { val fechaNueva = fechaSelec.plusDays(1)
                 calendarViewModel.cambioFecha(fechaNueva)
-                Toast.makeText(context, "Fecha seleccionada: ${fechaNueva.format(formatter)}", Toast.LENGTH_SHORT).show()}) {
-                Icon(Icons.Default.ArrowRight, contentDescription = "Incrementar día")
+                Toast.makeText(context, stringF+" ${fechaNueva.format(formatter)}", Toast.LENGTH_SHORT).show()}) {
+                Icon(Icons.Default.ArrowRight, contentDescription = stringResource(id = R.string.Decrementar))
             }
         }
 
         Divider()
         Spacer(modifier = Modifier.height(20.dp))
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            Text(text = "Graficas", textAlign = TextAlign.Center)
+            Text(text = stringResource(id = R.string.Graf), textAlign = TextAlign.Center,style = MaterialTheme.typography.title1)
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.Center,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                // Botón para el gráfico circular
                 IconButton(onClick = { mostrarGraficoCircular = true }) {
                     Icon(
                         Icons.Default.PieChart,
-                        contentDescription = "Gráfico Circular",
+                        contentDescription = stringResource(id = R.string.Circ),
                         tint = if (mostrarGraficoCircular) colorSeleccionado else colorNoSeleccionado
                     )
                 }
 
-                // Espacio entre iconos
-                Spacer(modifier = Modifier.width(16.dp))
 
-                // Botón para el gráfico de barras
+
+
+
                 IconButton(onClick = { mostrarGraficoCircular = false }) {
                     Icon(
                         Icons.Default.BarChart,
-                        contentDescription = "Gráfico de Barras",
+                        contentDescription = stringResource(id = R.string.Bar),
                         tint = if (!mostrarGraficoCircular) colorSeleccionado else colorNoSeleccionado
                     )
                 }
-                Spacer(Modifier.width(8.dp)) // Espacio entre los iconos y el selector de agrupación
+                Spacer(Modifier.width(8.dp))
 
-                // Texto antes del DropdownMenu
-                Text(text = "Agrupado por:")
 
-                // DropdownMenu para seleccionar la agrupación
+                Text(text = stringResource(id = R.string.Agrupado))
+
+
                 var textoElecc = ""
                 if (agrupacionCategoria) {
-                    textoElecc = "Categoria"
+                    textoElecc = stringResource(id = R.string.Categ)
                 } else {
-                    textoElecc = "Actividad"
+                    textoElecc = stringResource(id = R.string.Act)
                 }
-                // DropdownMenu para seleccionar la agrupación
                 Box {
                     Row( modifier = Modifier
-                        .padding(1.dp).clickable(onClick = { expanded = true }), // Añade un poco de padding para un mejor diseño
+                        .padding(1.dp)
+                        .clickable(onClick = { expanded = true }),
                         verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.SpaceBetween // Espacia los elementos uniformemente
+                        horizontalArrangement = Arrangement.SpaceBetween
                     ){
                         Text(
                             text = textoElecc,
@@ -224,7 +215,7 @@ fun DatePickerComposable(calendarViewModel: CalendarViewModel) {
                         )
                         Icon(
                             Icons.Default.ArrowDropDown,
-                            contentDescription = "Selector de gráficos",
+                            contentDescription = stringResource(id = R.string.Selector),
                             tint = if (mostrarGraficoCircular) colorSeleccionado else colorNoSeleccionado
                         )
 
@@ -234,11 +225,11 @@ fun DatePickerComposable(calendarViewModel: CalendarViewModel) {
                         expanded = expanded,
                         onDismissRequest = { expanded = false }
                     ) {
-                        DropdownMenuItem( text = { Text("Actividad") },onClick = {
+                        DropdownMenuItem( text = { Text(stringResource(id = R.string.Act)) },onClick = {
                             agrupacionCategoria = false
                             expanded = false
                         })
-                        DropdownMenuItem(text = { Text("Categoria") },onClick = {
+                        DropdownMenuItem(text = { Text(stringResource(id = R.string.Categ)) },onClick = {
                             agrupacionCategoria = true
                             expanded = false
                         })
@@ -255,36 +246,65 @@ fun DatePickerComposable(calendarViewModel: CalendarViewModel) {
 
         Spacer(modifier = Modifier.height(35.dp))
 
-        // Botón para "Descargar actividades"
-        Button(
-            onClick = { /* TODO: Acción de descarga */ },
-            // Ajusta el shape para hacerlo más rectangular
-            shape = RoundedCornerShape(4.dp),
-            modifier = Modifier
-                .height(48.dp) // Asegura que el botón sea más alto y rectangular
-                .fillMaxWidth(0.8f) // Usa un porcentaje del ancho máximo para tamaño del botón
-        ) {
-            Text("Descargar actividades")
-        }
 
-        // Espacio entre botones
+        SaveAsJSONSection(calendarViewModel = calendarViewModel)
+
+
+
         Spacer(modifier = Modifier.height(35.dp))
 
-        // Botón para "Compartir"
+        var text="Nothing"
+        var strings:MutableList<String> = mutableListOf()
+        strings.add(stringResource(id = R.string.Invertido))
+        strings.add(stringResource(id = R.string.Manera))
+        if (lista.isEmpty()){
+
+        }
+
         Button(
-            onClick = { /* TODO: Acción de compartir */ },
-            // Ajusta el shape para hacerlo más rectangular
+
+            onClick = {
+                if (!lista.isEmpty()) {
+                    // Ejecuta en una corutina para esperar asincrónicamente el resultado
+                    calendarViewModel.viewModelScope.launch {
+                        val resumen = StringBuilder()
+                        val fecha=fechaSelec.format(DateTimeFormatter.ISO_DATE)
+                        resumen.append(strings[0] + " $fecha" +" "+ strings[1] + "\n")
+                        resumen.append("\n")
+                             lista.forEach(){ act ->
+
+
+                                 resumen.append("${act.nombre} -> ${formatTime(act.tiempo) } \n")
+
+                            }
+                        resumen.append("\n")
+                        text=resumen.toString()
+
+
+                         // Asume que este es el texto que quieres compartir
+
+                        // Ahora que tienes el texto, prepara y lanza la intención de compartir
+                        val sendIntent: Intent = Intent().apply {
+                            action = Intent.ACTION_SEND
+                            putExtra(Intent.EXTRA_TEXT, text)
+                            type = "text/plain"
+                        }
+                        val shareIntent = Intent.createChooser(sendIntent, null)
+                        context.startActivity(shareIntent)
+                    }
+                }
+            },
+
             shape = RoundedCornerShape(4.dp),
             modifier = Modifier
-                .height(48.dp) // Asegura que el botón sea más alto y rectangular
-                .fillMaxWidth(0.8f) // Usa un porcentaje del ancho máximo para tamaño del botón
+                .height(40.dp)
         ) {
-            // Coloca el texto y el icono dentro de un Row para asegurar su correcta disposición
+
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Text("Compartir")
-                // Espacio entre el texto y el icono
+                Text(stringResource(id = R.string.Compartir),style = MaterialTheme.typography.body1)
+                
                 Spacer(modifier = Modifier.width(8.dp))
-                Icon(Icons.Default.Share, contentDescription = "Compartir")
+                Icon(Icons.Default.Share, contentDescription = stringResource(id = R.string.Compartir))
             }
         }
 
@@ -303,20 +323,19 @@ fun DatePickerComposable(calendarViewModel: CalendarViewModel) {
 //Esta funcion devuelve una lista de actividades que cuando agrupacionCategoria esta activo devuelve una actividad por categoria con la suma
 //de los tiempos de cada categoria, si no la deja como está
 fun agruparPorCategoria(lista: List<Actividad>, agrupacionCategoria: Boolean): List<Actividad> {
-    // Verifica si la agrupación por categoría está activada
     return if (agrupacionCategoria) {
-        // Agrupa las actividades por categoría
+
         lista.groupBy { it.categoria }
-            // Transforma cada grupo en un nuevo objeto Actividad
+
             .map { entry ->
                 Actividad(
-                    nombre = entry.key, // Usa el nombre de la categoría
-                    tiempo = entry.value.sumOf { it.tiempo }, // Suma los tiempos de todas las actividades en la categoría
-                    id = 1 // Puedes ajustar esto según tu modelo de datos
+                    nombre = entry.key,
+                    tiempo = entry.value.sumOf { it.tiempo },
+                    id = 1
                 )
             }
     } else {
-        // Si no se requiere agrupación, devuelve la lista original
+
         lista
     }
 }
@@ -326,7 +345,7 @@ fun Barras(lista: List<Actividad>) {
     var barras=ArrayList<BarChartData.Bar>()
     when {
         lista.isEmpty() -> {
-            Text(text = "No hay datos")
+            Text(text = stringResource(id = R.string.No_Data))
         }
 
         else -> {
@@ -349,10 +368,10 @@ fun Barras(lista: List<Actividad>) {
 
 
             BarChart(barChartData = BarChartData(bars = barras),modifier = Modifier
-                    .padding(horizontal = 20.dp, vertical = 20.dp)
+                .padding(horizontal = 20.dp, vertical = 20.dp)
                 .height(220.dp),  yAxisDrawer = SimpleYAxisDrawer(labelValueFormatter = ::formatTimeFloat, axisLineThickness = 0.dp  ), labelDrawer = SimpleValueDrawer(drawLocation = SimpleValueDrawer.DrawLocation.Outside)
             )
-            Spacer(modifier = Modifier.height(16.dp)) // Espacio entre el gráfico y la leyenda
+            Spacer(modifier = Modifier.height(16.dp))
 
             LeyendaMatriz(lista = lista)
         }
@@ -364,7 +383,7 @@ fun Tarta(lista : List<Actividad>) {
     var slices = ArrayList<PieChartData.Slice>()
     when {
         lista.isEmpty() -> {
-            Text(text = "No hay datos")
+            Text(text = stringResource(id = R.string.No_Data))
         }
 
         else -> {
@@ -393,7 +412,7 @@ fun Tarta(lista : List<Actividad>) {
 
             )
             Log.d("p","Tarta creada:"+slices.size)
-            Spacer(modifier = Modifier.height(16.dp)) // Espacio entre el gráfico y la leyenda
+            Spacer(modifier = Modifier.height(16.dp))
 
             LeyendaMatriz(lista = lista)
         }
@@ -424,7 +443,7 @@ var colores = mutableListOf(
 fun LeyendaItem(nombre: String, color: Color) {
     var expanded by remember { mutableStateOf(false) }
 
-    // Wrapper para detectar clics y mostrar el DropdownMenu
+
     Box(modifier = Modifier.clickable { expanded = true }) {
         Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier
             .width(100.dp)
@@ -467,9 +486,9 @@ fun LeyendaItem(nombre: String, color: Color) {
 @Composable
 fun LeyendaMatriz(lista: List<Actividad>) {
 
-    val numRows = (lista.size + 3) / 4
+    val numRows = (lista.size + 3) / 3
 
-    Column(Modifier.height(60.dp)) {
+    Column(Modifier.height(85.dp)) {
         var exit=false
         for (row in 0 until numRows) {
             if (exit){
@@ -477,15 +496,15 @@ fun LeyendaMatriz(lista: List<Actividad>) {
             }
 
             Row {
-                for (column in 0 until 4) {
+                for (column in 0 until 3) {
                     if (exit){
                         break
                     }
-                    val index = row * 4 + column
-                    if (index < lista.size) { // Comprobamos para no salirnos de la lista
+                    val index = row * 3 + column
+                    if (index < lista.size) {
                         val act = lista[index]
                         val col: Color = if (index >= colores.size) {
-                            LeyendaItem(nombre = "Otros", color = Color.Gray)
+                            LeyendaItem(nombre = stringResource(id = R.string.otros), color = Color.Gray)
                             exit=true
                             break
                         } else {
@@ -498,6 +517,51 @@ fun LeyendaMatriz(lista: List<Actividad>) {
         }
     }
 }
+
+
+
+@Composable
+private fun SaveAsJSONSection(calendarViewModel: CalendarViewModel) {
+    val formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy")
+    val fechaSelec by calendarViewModel.fechaSelec.collectAsState()
+    val filename = "activities_"+ "${fechaSelec.format(formatter)}"+".json"
+    val contentResolver = LocalContext.current.contentResolver
+    val saverLauncher = rememberLauncherForActivityResult(contract = ActivityResultContracts.CreateDocument(
+        "application/json"
+    )
+    ) { uri ->
+        if (uri != null) {
+            try {
+                contentResolver.openFileDescriptor(uri, "w")?.use {
+                    FileOutputStream(it.fileDescriptor).use { fileOutputStream ->
+                        fileOutputStream.write(
+                            (calendarViewModel.descargarActividadesJson()).toByteArray()
+                        )
+                    }
+                }
+            } catch (e: FileNotFoundException) {
+                e.printStackTrace()
+            } catch (e: IOException) {
+                e.printStackTrace()
+            }
+        }
+    }
+
+    // Ajustado para incluir ".json" correctamente
+    Button(
+        onClick = { saverLauncher.launch(filename) },
+        // Ajusta el shape para hacerlo más rectangular
+        shape = RoundedCornerShape(4.dp),
+        modifier = Modifier
+            .height(48.dp)
+    ) {
+        Text(stringResource(id = R.string.Descargar),style = MaterialTheme.typography.body1)
+    }
+
+
+}
+
+
 @Preview
 @Composable
 fun previewCalendar(){

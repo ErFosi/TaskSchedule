@@ -22,4 +22,25 @@
     <string name="settings">Konfigurazioa</string>
     <string name="Lista">Aktibitate lista</string>
     <string name="Estadísticas">Estadistikak</string>
+    <string name="noText">Ez dut ezer egin</string>
+    <string name="Invertido">"  "</string>
+    <string name="Manera">Eguneko denbora horrela erabili dut:</string>
+    <string name="FechaSelec">"Aukeratutako eguna: "</string>
+    <string name="Decrementar">Egun bat gutxiago</string>
+    <string name="Incrementar">Egun bat gehiago</string>
+    <string name="Graf">Grafikoak</string>
+    <string name="Circ">Grafiko biribila</string>
+    <string name="Bar">Barra grafikoa</string>
+    <string name="Agrupado">Taldekatu modua:</string>
+    <string name="Categ">Kategoria</string>
+    <string name="Act">Aktibitate</string>
+    <string name="Selector">Grafiko aukeratzaile</string>
+    <string name="Compartir">Partekatu</string>
+    <string name="No_Data">Egun honetarako ez dago daturik</string>
+    <string name="Descargar">Aktibitateak bajatu</string>
+    <string name="channel_act">Aktibitate kanala</string>
+    <string name="channel_desc">Aktibitate honetako kudeaketa kanala</string>
+    <string name="notification_title">Aktibitate bat egiten ari zara</string>
+    <string name="Estashaciendo">"Egiten ari zara "</string>
+    <string name="pulsa">Sakatu aldatzeko</string>
 </resources>
