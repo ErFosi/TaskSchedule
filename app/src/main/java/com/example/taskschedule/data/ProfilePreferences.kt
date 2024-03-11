@@ -23,17 +23,17 @@ import javax.inject.Singleton
 
 val Context.profilePreferences: DataStore<Preferences> by preferencesDataStore("settings")
 
+/************************************************************************
+ * Enumeración de idiomas con sus respectivos codigos
+ *************************************************************************/
 enum class Idioma(val language: String, val code: String) {
     EN("English", "en"),
     EU("Euskera", "eu"),
     ES("Español", "es");
     companion object {
-        /**
-         * Get the [AppLanguage] from a language code.
-         *
-         * @param code Language's code as string
-         * @return That code's corresponding App's language as an [AppLanguage]. Defaults to [EN].
-         */
+        /************************************************************************
+         * Función para obtener el objeto Idioma a partir del codigo
+         *************************************************************************/
         fun getFromCode(code: String) = when (code) {
             EU.code -> EU
             EN.code -> EN
@@ -45,6 +45,11 @@ enum class Idioma(val language: String, val code: String) {
 data class Settings(val oscuro:Boolean,
 val idioma:Idioma)
 
+/************************************************************************
+ * DataStore de los ajustes, este es un singleton y almacenará los valores
+ * del tema y el idioma.
+ *
+ *************************************************************************/
 @Singleton
 class ProfilePreferencesDataStore @Inject constructor(
     @ApplicationContext context: Context
@@ -69,20 +74,27 @@ private val profilePreferences=context.profilePreferences
 
             Settings(oscuro,idioma)
         }
+
+    /************************************************************************
+     * Función para modificar el tema
+     *************************************************************************/
     suspend fun updateOscuro(oscuro: Boolean){
         profilePreferences.edit { settings ->
             settings[PreferencesKeys.OSCURO_KEY]= oscuro
 
         }
     }
+    /************************************************************************
+     *La siguiente función devuelve un flow del idioma preferido por el usuario
+     *************************************************************************/
     fun language(): Flow<String> = profilePreferences.data.map { preferences -> preferences[PreferencesKeys.IDIOMA_KEY]?: Locale.getDefault().language }
+
+    /************************************************************************
+     * Función para modificar el lenguaje
+     *************************************************************************/
     suspend fun setLanguage(code: String) {
         profilePreferences.edit { settings ->  settings[PreferencesKeys.IDIOMA_KEY]=code}
         Log.d("P","Se esta cambiando el lenguaje en el dataStore"+code)
     }
-    suspend fun updateIdioma(idioma:Idioma){
-        profilePreferences.edit { settings ->
-            settings[PreferencesKeys.IDIOMA_KEY]=idioma.name
-        }
-    }
+
 }

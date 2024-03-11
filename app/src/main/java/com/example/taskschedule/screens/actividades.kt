@@ -65,6 +65,10 @@ import kotlinx.coroutines.delay
 import androidx.compose.ui.res.stringResource
 import com.example.taskschedule.R
 
+/*************************************************************************
+ * Esta función es la linea animada que aparece cuando se le da al play.
+ * Utiliza un canvas para realizar dicha animación.
+ *************************************************************************/
 @Composable
 fun AnimatedStripe() {
     val color= MaterialTheme.colorScheme.primary
@@ -91,9 +95,17 @@ fun AnimatedStripe() {
         )
     }
 }
+
+/************************************************************************
+ * Composable de cada actividad generada, contiene la actividad en si.
+ * La lógica esta en el viewmodel donde se modifican todos los valores.
+ * Además cabe destacar que cuando se modifica una actividad se hace una copia
+ * y esta es la que se modifica en la BD de esta manera compose no está
+ * pendiente de cada actividad a la hora de la renderización obteniendo
+ * un mejor rendimiento
+ *************************************************************************/
 @Composable
 fun actividad(actividad: Actividad, actividadesViewModel: ActivitiesViewModel) {
-    // Utiliza los colores del tema actual
     val gradientBrush = Brush.horizontalGradient(
         colors = listOf(MaterialTheme.colorScheme.primary, MaterialTheme.colorScheme.secondary)
     )
@@ -119,7 +131,7 @@ fun actividad(actividad: Actividad, actividadesViewModel: ActivitiesViewModel) {
 
     LaunchedEffect(isVisible.value) {
         if (!isVisible.value) {
-            // Espera un poco antes de ejecutar la acción de eliminación
+            //Se añade un poco de delay para que la animación ocurra antes de la eliminación
             delay(350)
             isVisible.value = true
             actividadesViewModel.onRemoveClick(actividad.id)
@@ -144,7 +156,6 @@ fun actividad(actividad: Actividad, actividadesViewModel: ActivitiesViewModel) {
             colors = CardDefaults.cardColors(containerColor = backgroundColor)
         ) {
             Column(modifier = Modifier.background(backgroundColor)) {
-                // Nombre en una barra superior
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -158,7 +169,6 @@ fun actividad(actividad: Actividad, actividadesViewModel: ActivitiesViewModel) {
                     )
                 }
 
-                // Contenido de la actividad
                 Column(
                     modifier = Modifier
                         .padding(horizontal = 16.dp, vertical = 8.dp)
@@ -246,7 +256,15 @@ fun actividad(actividad: Actividad, actividadesViewModel: ActivitiesViewModel) {
     }
 }
 
-
+/************************************************************************
+ * Composable que contiene la estructura de la lista de actividades
+ * se encarga de poner el botón y de los diálogos para la creación de
+ * actividades.
+ *
+ * Si bien no es una táctica recomendable usar un scaffold dentro de otro
+ * en este caso no se han dado problemas ya que no han sido modificados en
+ * exceso
+ *************************************************************************/
 @Composable
 fun ListaActividadesUI(actividadesViewModel: ActivitiesViewModel) {
     val showDialog = remember { mutableStateOf(false) }
@@ -272,7 +290,6 @@ fun ListaActividadesUI(actividadesViewModel: ActivitiesViewModel) {
             onDismissRequest = { showDialog.value = false },
             title = { Text(stringResource(id = R.string.agregar_act)) },
             text = {
-                // TextField para ingresar el nombre de la nueva actividad
                 TextField(
                     value = textState.value,
                     onValueChange = { textState.value = it },
@@ -298,7 +315,14 @@ fun ListaActividadesUI(actividadesViewModel: ActivitiesViewModel) {
         )
     }
 }
-
+/************************************************************************
+ * Composable que itera sobre la lista de actividades del dia actual
+ * generando un lazy column si el movil está en vertical y un lazyVerticalGrid
+ * si está en horizontal.
+ *
+ * Los lazyColumn, LazyRow, y LazyVerticalGrid son análogos a los recicle list
+ * de java y optimizan como se visualiza la lista mejorando el rendimiento
+ *************************************************************************/
 @Composable
 fun ListaActividades(modifier: Modifier = Modifier, actividadesViewModel: ActivitiesViewModel) {
     val lista = actividadesViewModel.actividades.collectAsState(initial = emptyList()).value
@@ -398,7 +422,9 @@ fun listaPreview(){
     ListaActividades(actividadesViewModel = viewModelo)
 }
 */
-
+/************************************************************************
+ * Función que genera un string en el formato h m s dado los segundos totales
+ *************************************************************************/
 fun formatTime(seconds: Int): String {
     val hours = seconds / 3600
     val minutes = (seconds % 3600) / 60
@@ -409,7 +435,14 @@ fun formatTime(seconds: Int): String {
         else -> "${remainingSeconds}s"
     }
 }
-
+/************************************************************************
+ * Función que genera un string en el formato h m s dado los segundos totales
+ * la diferencia con la función anterior es que está funciona con float
+ *
+ * Esta función es usada con los gráficos ya que solo aceptan floats, además
+ * está gestionado el caso de que el tiempo sea mayor a 24h lo cual en teoría
+ * debería ser imposible.
+ *************************************************************************/
 fun formatTimeFloat(seconds: Float): String {
     val hours = seconds / 3600
     val minutes = (seconds % 3600) / 60

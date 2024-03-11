@@ -22,16 +22,16 @@ import com.example.taskschedule.viewmodels.ActivitiesViewModel
 import com.example.taskschedule.R
 import com.example.taskschedule.data.Idioma
 
-
+/************************************************************************
+ * Composable que contiene la interfaz de los ajustes de la aplicación,
+ * junto al viewmodel se encargan de toda la personalización, el viewmodel
+ * se encarga de modificar el datastore.
+ *************************************************************************/
 
 @Composable
 fun LanguageAndThemeSelector(actividadesViewModel: ActivitiesViewModel) {
-    var idioma=""
-    //val context = LocalContext.current
-    idioma=stringResource(id = R.string.idioma)
+    var idioma=stringResource(id = R.string.idioma)
     var selectedLanguage by remember { mutableStateOf(idioma) }
-    //var isDarkTheme by remember { mutableStateOf(false) }
-    //var expanded by remember{ mutableStateOf(false) }
     var expanded by rememberSaveable {
         mutableStateOf(false)
     }
@@ -51,6 +51,7 @@ fun LanguageAndThemeSelector(actividadesViewModel: ActivitiesViewModel) {
                     DropdownMenuItem(
                         text = { Text(idioma,fontWeight = FontWeight.Bold) },
                         onClick = {
+                            //Se podria mejorar con un map,o un diccionario pero se ha considerado una implementación más sencilla
                             expanded=false
                             selectedLanguage=idioma
                             var code="es"

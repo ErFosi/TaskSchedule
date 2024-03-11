@@ -8,7 +8,13 @@ import androidx.room.PrimaryKey
 import androidx.compose.runtime.Immutable
 import java.time.LocalDate
 
-
+/************************************************************************
+ * Entidad de la base de datos, el id es autogenerado por lo que da igual
+ * cual se le pase.
+ *
+ * Es inmutable por lo que para las modificaciones se reemplazan por copias
+ * que sí son mutables
+ *************************************************************************/
 @Immutable
 @Entity(tableName = "actividades")
 data class Actividad(

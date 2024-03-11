@@ -104,11 +104,14 @@ import com.example.taskschedule.R
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
-
+/************************************************************************
+ * Composable que contiene toda la parte de la interfaz referente a la
+ * selección del día y contiene la estructura de toda la página combinando
+ * el gráfico, la leyenda y demás composables de esta sección.
+ *************************************************************************/
 @Composable
 fun DatePickerComposable(calendarViewModel: CalendarViewModel) {
     val context = LocalContext.current
-    val calendar = remember { Calendar.getInstance() }
     val fechaSelec by calendarViewModel.fechaSelec.collectAsState()
     val formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy")
     val lista by calendarViewModel.actividadesFecha.collectAsState(initial = emptyList())
@@ -265,7 +268,6 @@ fun DatePickerComposable(calendarViewModel: CalendarViewModel) {
 
             onClick = {
                 if (!lista.isEmpty()) {
-                    // Ejecuta en una corutina para esperar asincrónicamente el resultado
                     calendarViewModel.viewModelScope.launch {
                         val resumen = StringBuilder()
                         val fecha=fechaSelec.format(DateTimeFormatter.ISO_DATE)
@@ -280,10 +282,6 @@ fun DatePickerComposable(calendarViewModel: CalendarViewModel) {
                         resumen.append("\n")
                         text=resumen.toString()
 
-
-                         // Asume que este es el texto que quieres compartir
-
-                        // Ahora que tienes el texto, prepara y lanza la intención de compartir
                         val sendIntent: Intent = Intent().apply {
                             action = Intent.ACTION_SEND
                             putExtra(Intent.EXTRA_TEXT, text)
@@ -318,10 +316,13 @@ fun DatePickerComposable(calendarViewModel: CalendarViewModel) {
 
 }
 
+/************************************************************************
+ * Esta función devuelve una lista de actividades que cuando agrupacionCategoria
+ * esta activo devuelve una actividad por categoría con la suma
+ * de los tiempos de cada categoría, si no la deja como está
+ *************************************************************************/
 
 
-//Esta funcion devuelve una lista de actividades que cuando agrupacionCategoria esta activo devuelve una actividad por categoria con la suma
-//de los tiempos de cada categoria, si no la deja como está
 fun agruparPorCategoria(lista: List<Actividad>, agrupacionCategoria: Boolean): List<Actividad> {
     return if (agrupacionCategoria) {
 
@@ -339,7 +340,9 @@ fun agruparPorCategoria(lista: List<Actividad>, agrupacionCategoria: Boolean): L
         lista
     }
 }
-
+/************************************************************************
+ * Composable en cargo de la elaboración del gráfico de barras
+ *************************************************************************/
 @Composable
 fun Barras(lista: List<Actividad>) {
     var barras=ArrayList<BarChartData.Bar>()
@@ -377,7 +380,9 @@ fun Barras(lista: List<Actividad>) {
         }
     }
 }
-
+/************************************************************************
+ * Composable que se encarga del gráfico circular
+ *************************************************************************/
 @Composable
 fun Tarta(lista : List<Actividad>) {
     var slices = ArrayList<PieChartData.Slice>()
@@ -418,6 +423,9 @@ fun Tarta(lista : List<Actividad>) {
         }
     }
 }
+/************************************************************************
+ * Lista de colores usados en los graficos
+ *************************************************************************/
 var colores = mutableListOf(
     Color(0xFF4CAF50), // Verde
     Color(0xFFFFC107), // Ámbar
@@ -439,6 +447,9 @@ var colores = mutableListOf(
     Color(0xFF607D8B)  // Azul grisáceo
 )
 
+/************************************************************************
+ * Composable que contiene un item de la leyenda
+ *************************************************************************/
 @Composable
 fun LeyendaItem(nombre: String, color: Color) {
     var expanded by remember { mutableStateOf(false) }
@@ -451,7 +462,7 @@ fun LeyendaItem(nombre: String, color: Color) {
             Box(
                 modifier = Modifier
                     .size(15.dp)
-                    .background(color = color, shape = RoundedCornerShape(3.dp)) // Usa el color y forma deseados
+                    .background(color = color, shape = RoundedCornerShape(3.dp))
             )
             Spacer(modifier = Modifier.width(3.dp))
             Text(
@@ -482,7 +493,10 @@ fun LeyendaItem(nombre: String, color: Color) {
         }
     }
 }
-
+/************************************************************************
+ * Composable que crea una matriz de filas de 3 items de leyendas del
+ * composable anterior
+ *************************************************************************/
 @Composable
 fun LeyendaMatriz(lista: List<Actividad>) {
 
@@ -519,7 +533,11 @@ fun LeyendaMatriz(lista: List<Actividad>) {
 }
 
 
-
+/************************************************************************
+ * Botón encargado del botón de descargar los datos en un fichero de texto
+ * con formato json, tiene la parte de la logica en la primera parte y la
+ * interfaz al final
+ *************************************************************************/
 @Composable
 private fun SaveAsJSONSection(calendarViewModel: CalendarViewModel) {
     val formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy")
@@ -547,10 +565,8 @@ private fun SaveAsJSONSection(calendarViewModel: CalendarViewModel) {
         }
     }
 
-    // Ajustado para incluir ".json" correctamente
     Button(
         onClick = { saverLauncher.launch(filename) },
-        // Ajusta el shape para hacerlo más rectangular
         shape = RoundedCornerShape(4.dp),
         modifier = Modifier
             .height(48.dp)
@@ -561,14 +577,3 @@ private fun SaveAsJSONSection(calendarViewModel: CalendarViewModel) {
 
 }
 
-
-@Preview
-@Composable
-fun previewCalendar(){
-    //DatePickerComposable()
-}
-@Preview
-@Composable
-fun CalendarPreview() {
-
-}

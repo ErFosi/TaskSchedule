@@ -34,6 +34,12 @@ import kotlinx.coroutines.flow.last
 import java.time.LocalDate
 import kotlin.random.Random
 
+/************************************************************************
+ * Viewmodel que se encargará de la lógica de toda la app de forma general
+ * y en especifico del apartado de lista actividades y de los ajustes
+ *************************************************************************/
+
+
 @HiltViewModel
 class ActivitiesViewModel @Inject constructor(
 private val settings:ProfilePreferencesDataStore,
@@ -44,6 +50,10 @@ private val languageManager: LanguageManager,
     val idioma = settings.settingsFlow.map {it.idioma}
     private val _actividades = actividadesRepo.getActividadesPorFecha(LocalDate.now())
     init {
+        /************************************************************************
+         * Cuando se lance la app, el viewmodel tratará de aplicar el ultimo lenguaje
+         * guardado por el usuario en el datastore de settings
+         *************************************************************************/
         this.settings.language()
         viewModelScope.launch {
             //changeLang(idioma.first())
@@ -51,6 +61,9 @@ private val languageManager: LanguageManager,
             Log.d("I","Se inicia la app con el idioma:"+settings.language().first())
         }
     }
+    /************************************************************************
+     * Funcion que modifica la preferencia sobre el tema oscuro o claro
+     *************************************************************************/
     fun cambiarOscuro(oscuro : Boolean){
         viewModelScope.launch{settings.updateOscuro(oscuro)}
 
@@ -58,20 +71,24 @@ private val languageManager: LanguageManager,
 
 
 
-
+    /************************************************************************
+     * Función que es llamada desde los composables cuando un usuario
+     * selecciona otro idioma
+     *************************************************************************/
     fun updateIdioma(idioma:Idioma){
         viewModelScope.launch { settings.setLanguage(idioma.code) }
         this.changeLang(idioma)
         Log.d("t","Se actualiza el idioma a"+idioma.language)
     }
+
     val actividades: Flow<List<Actividad>>
         get()=_actividades
 
-    fun agregarActTest(actividad: Actividad){
-        viewModelScope.launch{
-            actividadesRepo.insertActividad(actividad)
-        }
-    }
+
+    /************************************************************************
+     * Función que dado un nombre crea una nueva actividad y la inserta en la
+     * BD mediante el DAO
+     *************************************************************************/
     fun agregarActividad(nombre: String) {
 
         val nuevaActividad = Actividad(
@@ -80,27 +97,21 @@ private val languageManager: LanguageManager,
             actividadesRepo.insertActividad(nuevaActividad)
         }
     }
-
+    /************************************************************************
+     * Función que se encarga de la logica detrás del boton de play donde
+     * registra cuanto tiempo ha pasado y modifica los valores de la actividad
+     * en la BD mediante el DAO
+     *************************************************************************/
     fun togglePlay(actividad: Actividad, context: Context) {
-        // Encuentra el índice de la actividad en la lista
-
             val currentActividad = actividad.copy()
 
             if (currentActividad.isPlaying) {
-                // Calcula la duración desde el inicio hasta ahora y actualiza el tiempo
                 val endTime = System.currentTimeMillis()
                 val diff = (endTime - (currentActividad.startTimeMillis ?: endTime)) / 1000
                 currentActividad.tiempo += diff.toInt()
-                //currentActividad.tiempostate = currentActividad.tiempo
-                // Actualiza los estados para reflejar que la actividad ha sido detenida
-                //currentActividad.isPlayingState = false
                 currentActividad.isPlaying = false
-                //currentActividad.startTimeMillis = null
             } else {
-                // Marca el inicio de la actividad
                 currentActividad.startTimeMillis = System.currentTimeMillis()
-                // Actualiza los estados para reflejar que la actividad está en reproducción
-                //currentActividad.isPlayingState = true
                 currentActividad.isPlaying = true
                 sendNotification(actividad, context)
             }
@@ -112,7 +123,10 @@ private val languageManager: LanguageManager,
     }
 
 
-    // Método para actualizar la categoría de una actividad
+    /************************************************************************
+     * Método para actualizar la categoría de una actividad
+     *************************************************************************/
+
     fun updateCategoria(act: Actividad, nuevaCategoria: String) {
        viewModelScope.launch {
            actividadesRepo.updateActividad(act)
@@ -120,31 +134,50 @@ private val languageManager: LanguageManager,
 
     }
 
+    /************************************************************************
+     * Función encargada de eliminar la actividad, llama al DAO para modificarlo
+     * en la BD.
+     *************************************************************************/
     fun onRemoveClick(id: Int) {
 
-            // Intenta eliminar el elemento por el índice dado
+
             viewModelScope.launch {
                var act=actividadesRepo.getActividadStream(id)
                 act.collect { actividad ->
-                    // act es ahora una instancia de Actividad y puede ser usada dentro de este bloque
                     if (actividad != null) {
                         actividadesRepo.deleteActividad(actividad)
                     }
-                    // Considera detener la recolección si solo necesitas una instancia,
-                    // ya que un Flow puede emitir múltiples elementos.
-                    return@collect // Rompe el flujo después del primer elemento para evitar múltiples eliminaciones.
+                    return@collect
                 }
             }
 
     }
-    //apartado del idioma
-    // Current app's language and preferred language (may not be the same at the beginning)
-    val currentSetLang by languageManager::currentLang
+
+
+    /************************************************************************
+     ******************************IDIOMA************************************
+     *************************************************************************/
+
+
+    /************************************************************************
+     * Función que utiliza el LanguageUtils para la modificación del idioma
+     * Locale
+     * *************************************************************************/
     fun changeLang(idioma: Idioma) {
         languageManager.changeLang(idioma)
-        //viewModelScope.launch(Dispatchers.IO) { settings.updateIdioma(idioma) }
     }
 
+    /************************************************************************
+     ***************************NOTIFICACIONES*******************************
+     *************************************************************************/
+
+
+
+    /************************************************************************
+     * Función donde se genera la notificación que ocurrirá siempre que se de
+     * al botón de play de alguna actividad, esta guarda el id en el Extra
+     * para poder gestionarlo una vez se clicka el boton de la notificación
+     *************************************************************************/
     private fun sendNotification(actividad:Actividad, context: Context){
         val notificationManager = ContextCompat.getSystemService(
             context,
@@ -169,22 +202,29 @@ private val languageManager: LanguageManager,
             notify(generateRandomNotificationId(), builder.build())
         }
     }
-
+    /************************************************************************
+     * Función que genera un número aleatorio para el id de la notificación,
+     * de esta manera podremos crear más de una notificación, si bien es
+     * verdad que pueden coincidir la probabilidad es bajisima (1 en 10.000)
+     *************************************************************************/
     fun generateRandomNotificationId(): Int {
-        // Genera un ID aleatorio dentro de un rango. Puedes ajustar el rango según sea necesario.
+        // Genera un ID aleatorio dentro de un rango. Se puede ajustar el rango según sea necesario.
         return Random.nextInt(1, 10000)
     }
+
+    /************************************************************************
+     * Función que usa el DAO para acceder a la BD y obtener la actividad cuya id
+     * concuerde con la dada
+     *************************************************************************/
     fun obtenerActividadPorId(id: Int): Flow<Actividad?> {
-        // Retorna el Flow directamente para ser coleccionado de forma asíncrona donde sea necesario
+        // Devuelve el Flow directamente para ser coleccionado de forma asíncrona donde sea necesario
         return actividadesRepo.getActividadStream(id)
     }
+
+    /************************************************************************
+     * Información relativa a las notificaciones
+     *************************************************************************/
     companion object {
-        private const val CHANNEL_ID = "Task_channel" // Consider using a unique ID for each notification
+        private const val CHANNEL_ID = "Task_channel"
     }
-}
-
-
-
-private fun getTasks(): List<Actividad> {
-    return emptyList()
 }

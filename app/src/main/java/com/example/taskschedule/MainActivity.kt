@@ -62,16 +62,22 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        // Create the Authentication Notification Channel
+        /************************************************************************
+         * Creación del canal de notificaciones
+         *************************************************************************/
         val name = getString(R.string.channel_act)
         val descriptionText = getString(R.string.channel_desc)
 
         val mChannel = NotificationChannel("Task_channel", name, NotificationManager.IMPORTANCE_LOW)
         mChannel.description = descriptionText
         onNewIntent(intent)
-        // Register the channel with the system
+
         val notificationManager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
         notificationManager.createNotificationChannel(mChannel)
+
+        /************************************************************************
+         * Composable de la actividad
+         *************************************************************************/
         setContent {
             TaskSchedule(useDarkTheme  = viewModel.oscuro.collectAsState(initial = true).value) {
                 TaskScheduleApp(viewModel = viewModel)
@@ -79,6 +85,14 @@ class MainActivity : AppCompatActivity() {
 
         }
     }
+
+    /************************************************************************
+     * Esta función se encarga de gestionar el botón "STOP" de la notificación,
+     * recoge la información del bundle, el id de la actividad
+     * la busca y luego para dicha actividad
+     *
+    *************************************************************************/
+
     override fun onNewIntent(intent: Intent?) {
         super.onNewIntent(intent)
         var context=this
@@ -95,7 +109,11 @@ class MainActivity : AppCompatActivity() {
         }
     }
 }
-
+/************************************************************************
+ * Composable con el esqueleto de la actividad, esta formado por
+ * un scaffold y el contenido interior va variando gracias al nav
+ * que depende de la ruta modifica el contenido
+ *************************************************************************/
 @Composable
 fun TaskScheduleApp(viewModel: ActivitiesViewModel) {
     val navController = rememberNavController()
@@ -103,13 +121,18 @@ fun TaskScheduleApp(viewModel: ActivitiesViewModel) {
         topBar = { TaskBar(navController) },
         bottomBar = { TaskDownBar(navController) }
     ) { innerPadding ->
-        // Aplica el innerPadding al contenido para evitar que quede oculto por las barras
+
         Box(modifier = Modifier.padding(innerPadding)) {
             NavigationGraph(navController = navController, viewModel = viewModel)
         }
     }
 }
 
+
+/************************************************************************
+ * Composable para el action bar, depende en que ruta esté pone el nombre
+ * la ubicación, además contiene el boton de settings
+ *************************************************************************/
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TaskBar(
@@ -142,11 +165,11 @@ fun TaskBar(
                         Icon(Icons.Filled.List, contentDescription = null)
                     }
                     "datePicker" -> {
-                        // Ícono no pulsable para las estadísticas
+
                         Icon(Icons.Filled.BarChart, contentDescription = null)
                     }
                     "settings" -> {
-                        // Ícono no pulsable para las estadísticas
+
                         Icon(Icons.Filled.Settings, contentDescription = null)
                     }
 
@@ -160,9 +183,7 @@ fun TaskBar(
         navigationIcon = {},
         actions = {
             IconButton(onClick = {navController.navigate("settings"){
-                // Configura el lanzador para evitar múltiples instancias de la misma pantalla en el back stack
                 launchSingleTop = true
-                // Opcional: Puedes restaurar el estado cuando reingresas a una pantalla desde el back stack
                 restoreState = false
             }}) {
                 Icon(Icons.Filled.Settings, contentDescription = "Settings")
@@ -171,13 +192,14 @@ fun TaskBar(
     )
 }
 
+/************************************************************************
+ * Barra inferior para navegar entre las estadisticas y la lista de tasks
+ * Tiene dos iconos pulsables que hacen cambiar la ruta para el nav
+ *************************************************************************/
 @Composable
 fun TaskDownBar(navController: NavHostController) {
-    // Observa la entrada actual de la pila de navegación para determinar la pantalla activa
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route ?: ""
-
-    // Define los iconos y rutas para tus botones/iconos
     val items = listOf(
         "listaActividades" to Icons.Filled.List,
         "datePicker" to Icons.Filled.DateRange
@@ -186,16 +208,14 @@ fun TaskDownBar(navController: NavHostController) {
 
     Surface(
         modifier = Modifier.fillMaxWidth(),
-        color = MaterialTheme.colorScheme.primaryContainer, // Color de fondo de la barra
-        shadowElevation = 8.dp // Sombra para dar efecto de elevación
+        color = MaterialTheme.colorScheme.primaryContainer,
+        shadowElevation = 8.dp
     ) {
         Row {
             items.forEach { (route, icon) ->
                 IconButton(
                     onClick = {if (currentRoute != route) {navController.navigate(route){
-                        // Configura el lanzador para evitar múltiples instancias de la misma pantalla en el back stack
                         launchSingleTop = true
-                        // Opcional: Puedes restaurar el estado cuando reingresas a una pantalla desde el back stack
                         restoreState = false
                     }}  },
                     modifier = Modifier.weight(1f)
@@ -203,8 +223,8 @@ fun TaskDownBar(navController: NavHostController) {
                     Icon(
                         imageVector = icon,
                         contentDescription = null,
-                        tint = if (currentRoute == route) MaterialTheme.colorScheme.primary // Color cuando está seleccionado
-                        else MaterialTheme.colorScheme.onSurface.copy() // Color cuando no está seleccionado
+                        tint = if (currentRoute == route) MaterialTheme.colorScheme.primary
+                        else MaterialTheme.colorScheme.onSurface.copy()
                     )
                 }
             }
@@ -212,6 +232,10 @@ fun TaskDownBar(navController: NavHostController) {
     }
 }
 
+/************************************************************************
+ * Composable con el navhost, el encargado de cambiar el contenido en
+ * función de la ruta
+ *************************************************************************/
 @Composable
 fun NavigationGraph(navController: NavHostController, viewModel: ActivitiesViewModel) {
     NavHost(navController = navController, startDestination = "listaActividades", Modifier.fillMaxSize()) {

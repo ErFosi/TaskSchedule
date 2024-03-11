@@ -4,6 +4,9 @@ import com.example.taskschedule.data.Actividad
 import kotlinx.coroutines.flow.Flow
 import java.time.LocalDate
 
+/************************************************************************
+ * Interfaz del repositorio que contendra el DAO
+ *************************************************************************/
 interface ActividadesRepositoryInterface {
     /**
      * Obtiene todas las actividades de la base de datos

@@ -29,13 +29,22 @@ import kotlinx.coroutines.runBlocking
 class CalendarViewModel @Inject constructor(private val actividadesRepo: ActividadesRepository): ViewModel(){
     private val _fechaSelec = MutableStateFlow(LocalDate.now()) // Estado interno mutable
     val fechaSelec: StateFlow<LocalDate> = _fechaSelec
-    //var _actividadesFecha = actividadesRepo.getActividadesPorFecha(fecha = fechaSelec.value)
     val actividadesFecha: Flow<List<Actividad>> = _fechaSelec.flatMapLatest { fecha ->
         actividadesRepo.getActividadesPorFecha(fecha)
     }
+    /************************************************************************
+     * Función que se encarga de modificar la fecha, una vez se modifique
+     * la lista de actividadesFecha se verá modificada gracias a las propiedades
+     * del Flow
+     *************************************************************************/
     fun cambioFecha(nuevaFecha: LocalDate) {
-        _fechaSelec.value = nuevaFecha // Actualiza el estado
+        _fechaSelec.value = nuevaFecha
     }
+
+    /************************************************************************
+     * Función que se encarga de generar el string del json de todas las actividades
+     * de las actividades de ese dia
+     *************************************************************************/
     fun descargarActividadesJson(): String {
         val gson = GsonBuilder().setPrettyPrinting().create()
             return runBlocking {
