@@ -85,7 +85,7 @@ fun AnimatedStripe() {
     Canvas(modifier = Modifier
         .fillMaxWidth()
         .height(4.dp)) {
-        val stripeWidth = size.width * 0.2f  // Ancho de la franja
+        val stripeWidth = size.width * 0.2f
         val animatedOffset = animatedProgress * (size.width + stripeWidth) - stripeWidth
 
         drawRect(
