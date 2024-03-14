@@ -102,7 +102,10 @@ class MainActivity : AppCompatActivity() {
                 Log.d("T", "El id es $id")
                 viewModel.viewModelScope.launch {
                     viewModel.obtenerActividadPorId(id).firstOrNull()?.let { actividad ->
-                        viewModel.togglePlay(actividad = actividad, context)
+                        if (actividad.isPlaying){
+                            viewModel.togglePlay(actividad = actividad, context)
+                        }
+
                     } ?: Log.d("E", "Ha habido un error")
                 }
             }
@@ -155,9 +158,7 @@ fun TaskBar(
     TopAppBar(
         title = {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Text(text)
 
-                Spacer(Modifier.width(8.dp))
 
                 when (currentRoute) {
                     "listaActividades" -> {
@@ -174,6 +175,11 @@ fun TaskBar(
                     }
 
                 }
+
+                Spacer(Modifier.width(8.dp))
+
+                Text(text)
+
             }
         },
         colors = TopAppBarDefaults.mediumTopAppBarColors(

@@ -360,8 +360,12 @@ fun Barras(lista: List<Actividad>) {
                     tiempoSobrante=tiempoSobrante+act.tiempo
                 }
                 else{
+                    var tiempo =act.tiempo
+                    if (act.tiempo<1){
+                        tiempo=1
+                    }
                     col=colores[index]
-                    barras.add(BarChartData.Bar(label = "", value = act.tiempo.toFloat(), color = col))
+                    barras.add(BarChartData.Bar(label = "", value = tiempo.toFloat(), color = col))
                 }
 
             }
@@ -393,6 +397,10 @@ fun Tarta(lista : List<Actividad>) {
 
         else -> {
             lista.mapIndexed { index, act ->
+                var tiempo =act.tiempo
+                if(tiempo<1){
+                    tiempo=1
+                }
                 var col : Color
                 if(index>colores.size-1){
                     col=Color.Gray
@@ -402,7 +410,7 @@ fun Tarta(lista : List<Actividad>) {
                 }
                 slices.add(
                     PieChartData.Slice(
-                        value = act.tiempo.toFloat(),
+                        value = tiempo.toFloat(),
                         color = col
                     )
                 )

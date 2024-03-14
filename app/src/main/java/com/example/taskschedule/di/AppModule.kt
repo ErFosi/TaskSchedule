@@ -26,7 +26,7 @@ object AppModule {
     @Provides
     fun providesDatabase(@ApplicationContext app: Context) =
         Room.databaseBuilder(app, ActividadesDatabase::class.java, "actividades_db")
-            //.createFromAsset("actividades_db.db")
+            .createFromAsset("database/actividades_db.db") //Día con datos cargados 14 de Marzo
             .fallbackToDestructiveMigration()
             .build()
 

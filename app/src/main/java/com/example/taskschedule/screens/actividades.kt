@@ -114,25 +114,25 @@ fun actividad(actividad: Actividad, actividadesViewModel: ActivitiesViewModel) {
     val isVisible = remember { mutableStateOf(true) }
     var expanded by remember { mutableStateOf(false) }
     val categoriasMap = mapOf(
-        stringResource(id = R.string.otros) to "otros",
-        stringResource(id = R.string.ocio) to "ocio",
-        stringResource(id = R.string.ocupacion) to "ocupacion",
-        stringResource(id = R.string.deporte) to "deporte",
-        stringResource(id = R.string.diario) to "diario"
+        stringResource(id = R.string.otros) to "Otros",
+        stringResource(id = R.string.ocio) to "Ocio",
+        stringResource(id = R.string.ocupacion) to "Ocupación",
+        stringResource(id = R.string.deporte) to "Deporte",
+        stringResource(id = R.string.diario) to "Diario"
     )
     val categoriasMapInverso = mapOf(
-        "otros" to stringResource(id = R.string.otros)  ,
-        "ocio" to stringResource(id = R.string.ocio) ,
-        "ocupacion" to  stringResource(id = R.string.ocupacion),
-        "deporte" to stringResource(id = R.string.deporte)  ,
-        "diario" to stringResource(id = R.string.diario)
+        "Otros" to stringResource(id = R.string.otros)  ,
+        "Ocio" to stringResource(id = R.string.ocio) ,
+        "Ocupación" to  stringResource(id = R.string.ocupacion),
+        "Deporte" to stringResource(id = R.string.deporte)  ,
+        "Diario" to stringResource(id = R.string.diario)
     )
     val categorias = listOf(stringResource(id = R.string.otros), stringResource(id = R.string.ocio), stringResource(id = R.string.ocupacion), stringResource(id = R.string.deporte), stringResource(id = R.string.diario))
 
     LaunchedEffect(isVisible.value) {
         if (!isVisible.value) {
             //Se añade un poco de delay para que la animación ocurra antes de la eliminación
-            delay(350)
+            delay(199)
             isVisible.value = true
             actividadesViewModel.onRemoveClick(actividad.id)
         }
@@ -143,7 +143,7 @@ fun actividad(actividad: Actividad, actividadesViewModel: ActivitiesViewModel) {
         enter = EnterTransition.None,
         exit = fadeOut(animationSpec = tween(durationMillis = 300)) + shrinkVertically(
             animationSpec = tween(
-                durationMillis = 300
+                durationMillis = 200
             )
         ),
     ) {
