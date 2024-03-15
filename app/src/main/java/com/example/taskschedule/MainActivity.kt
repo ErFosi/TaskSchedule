@@ -37,6 +37,7 @@ import com.example.taskschedule.screens.ListaActividadesUI
 import com.example.taskschedule.screens.LanguageAndThemeSelector
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.filled.BarChart
@@ -229,8 +230,23 @@ fun TaskDownBar(navController: NavHostController) {
                     Icon(
                         imageVector = icon,
                         contentDescription = null,
-                        tint = if (currentRoute == route) MaterialTheme.colorScheme.primary
-                        else MaterialTheme.colorScheme.onSurface.copy()
+                        tint = if (currentRoute == route){
+                            if (isSystemInDarkTheme()){
+                                MaterialTheme.colorScheme.onSurface.copy()
+                            }
+                            else{
+                                MaterialTheme.colorScheme.primary
+                            }
+
+                        }
+                        else{
+                            if (isSystemInDarkTheme()){
+                                MaterialTheme.colorScheme.primary
+                            }
+                            else{
+                                MaterialTheme.colorScheme.onSurface.copy()
+                            }
+                        }
                     )
                 }
             }
