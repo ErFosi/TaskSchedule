@@ -230,23 +230,10 @@ fun TaskDownBar(navController: NavHostController) {
                     Icon(
                         imageVector = icon,
                         contentDescription = null,
-                        tint = if (currentRoute == route){
-                            if (isSystemInDarkTheme()){
-                                MaterialTheme.colorScheme.onSurface.copy()
-                            }
-                            else{
-                                MaterialTheme.colorScheme.primary
-                            }
+                        tint = if (currentRoute == route)MaterialTheme.colorScheme.onSurface.copy()
+                        else MaterialTheme.colorScheme.primary.copy(0.3f)
 
-                        }
-                        else{
-                            if (isSystemInDarkTheme()){
-                                MaterialTheme.colorScheme.primary
-                            }
-                            else{
-                                MaterialTheme.colorScheme.onSurface.copy()
-                            }
-                        }
+
                     )
                 }
             }
