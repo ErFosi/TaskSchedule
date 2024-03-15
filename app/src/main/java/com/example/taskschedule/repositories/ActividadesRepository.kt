@@ -1,7 +1,7 @@
 package com.example.taskschedule.repositories
 
 import com.example.taskschedule.data.Actividad
-import com.example.taskschedule.utils.ActividadesDao
+import com.example.taskschedule.data.ActividadesDao
 import kotlinx.coroutines.flow.Flow
 import java.time.LocalDate
 import javax.inject.Inject

@@ -1,4 +1,4 @@
-package com.example.taskschedule.utils
+package com.example.taskschedule.data
 import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Insert

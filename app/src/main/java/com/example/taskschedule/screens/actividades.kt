@@ -329,7 +329,7 @@ fun ListaActividades(modifier: Modifier = Modifier, actividadesViewModel: Activi
     val configuration = LocalConfiguration.current
 
     if (configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
-        // Pantalla horizontal: usar LazyVerticalGrid para dos columnas
+        // usar LazyVerticalGrid para dos columnas
         LazyVerticalGrid(
             columns = GridCells.Fixed(2),
             modifier = modifier.padding(vertical = 8.dp)
@@ -341,7 +341,7 @@ fun ListaActividades(modifier: Modifier = Modifier, actividadesViewModel: Activi
             }
         }
     } else {
-        // Pantalla vertical: usar LazyColumn para una columna
+        // usar LazyColumn para una columna
         LazyColumn(modifier = modifier.padding(vertical = 8.dp)) {
             items(items = lista, key = { actividad ->
                 actividad.id

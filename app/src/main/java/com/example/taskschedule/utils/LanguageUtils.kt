@@ -1,13 +1,8 @@
 package com.example.taskschedule.utils
 
-import android.content.Context
-import android.content.ContextWrapper
-import android.content.res.Configuration
-import androidx.activity.ComponentActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.os.LocaleListCompat
 import com.example.taskschedule.data.Idioma
-import java.util.*
 import javax.inject.Inject
 import javax.inject.Singleton
 
