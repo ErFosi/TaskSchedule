@@ -290,10 +290,15 @@ fun ListaActividadesUI(actividadesViewModel: ActivitiesViewModel) {
             onDismissRequest = { showDialog.value = false },
             title = { Text(stringResource(id = R.string.agregar_act)) },
             text = {
-                TextField(
+                TextField(//solo permite una linea y no más de 30 carácteres
                     value = textState.value,
-                    onValueChange = { textState.value = it },
-                    label = { Text(stringResource(id = R.string.nombre)) }
+                    onValueChange = {
+                        if (it.length <= 30) {
+                            textState.value = it
+                        }
+                    },
+                    label = { Text(stringResource(id = R.string.nombre)) },
+                    singleLine = true
                 )
             },
             confirmButton = {
