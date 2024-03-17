@@ -550,10 +550,10 @@ fun LeyendaMatriz(lista: List<Actividad>) {
 private fun SaveAsJSONSection(calendarViewModel: CalendarViewModel) {
     val formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy")
     val fechaSelec by calendarViewModel.fechaSelec.collectAsState()
-    val filename = "activities_"+ "${fechaSelec.format(formatter)}"+".json"
+    val filename = "activities_"+ "${fechaSelec.format(formatter)}"+".txt"
     val contentResolver = LocalContext.current.contentResolver
     val saverLauncher = rememberLauncherForActivityResult(contract = ActivityResultContracts.CreateDocument(
-        "application/json"
+        "application/text"
     )
     ) { uri ->
         if (uri != null) {

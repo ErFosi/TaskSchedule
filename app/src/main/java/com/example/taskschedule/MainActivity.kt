@@ -135,7 +135,7 @@ fun TaskScheduleApp(viewModel: ActivitiesViewModel) {
 
 /************************************************************************
  * Composable para el action bar, depende en que ruta esté pone el nombre
- * la ubicación, además contiene el boton de settings
+ * la ubicación, además contiene el botón de settings
  *************************************************************************/
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
