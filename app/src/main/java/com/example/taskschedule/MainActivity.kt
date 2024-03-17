@@ -200,7 +200,7 @@ fun TaskBar(
 }
 
 /************************************************************************
- * Barra inferior para navegar entre las estadisticas y la lista de tasks
+ * Barra inferior para navegar entre las estadísticas y la lista de tasks
  * Tiene dos iconos pulsables que hacen cambiar la ruta para el nav
  *************************************************************************/
 @Composable
